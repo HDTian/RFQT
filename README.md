@@ -19,4 +19,5 @@ where $b_j$ is the effect of the exposure on the covariate $M_j$; when $b_j$ is 
 Constructing a single Q tree caintains two iterative steps: 
 1. Determine the splitting covariate
 2. Split based on the candidate covariate
-![alt text](C:/Users/Haodong Tian/Desktop/Precision_Medicine_new/plots/Q-tree.png)
+![Q-tree.pdf](https://github.com/HDTian/RFQT/files/10981826/Q-tree.pdf)
+![Q-tree.pptx](https://github.com/HDTian/RFQT/files/10981826/Q-tree.pptx)
