@@ -114,3 +114,4 @@ or get the marginal covariate plot
 
        marginal_covariate_MR( Dat,index,method ) #index is the covariate index one choose; method refers the stratification used
 
+### 5. Integrated commands
