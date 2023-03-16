@@ -48,8 +48,8 @@ One may wish to obtain the MSE (if one is working on simulation data and methodo
 The permutation test is to assess the effect heterogeneity, accounting for uncertainty from the RFQT algorithm. The null hypothesis is that all the candidate covariates considered do not modify the treatment effect, and so the individual-level predicted causal effects are not more variable than would be expected due to chance alone. The test is a multiple fitting version of RFQT, each time the covariate information is permuted. The relevant RFQT fitting function under the permutation test is `BootstrapTreeFitting_real_bp`.
 
 
-## Step-to-Step guidance
-Below is the steo-by-step no-lost guidance for those implementing RFQT with a data.
+## Step-by-Step guidance
+Below is the step-by-step no-lost guidance for those implementing RFQT with a data.
 
 Depending on the type of data (simulation data or real application data) one wish to analyze, follow the coresponding guidance.
 
