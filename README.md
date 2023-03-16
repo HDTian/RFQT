@@ -115,3 +115,8 @@ or get the marginal covariate plot
        marginal_covariate_MR( Dat,index,method ) #index is the covariate index one choose; method refers the stratification used
 
 ### 5. Integrated commands
+One may wish to use an intergrated command to obtain certain results with the data inputed. One could use
+
+       RFQT_fitting_real(odat,vdat,hyperparameters_List,...)
+       
+where `odat` and `vdat` are generally the training set used for RFQT fitting and the testing set used for seperate analysis, divided from `Dat`. This integrated command returns the basic results (`RES`, predictions, VI measurements, etc). Be careful that this command could be time-costing.
