@@ -70,7 +70,7 @@ Assign the hyperparameter values, for example
        rate<-round(JJ*2/5  )/JJ #JJ is the number of covariates   
        Qthreshold<-3.0
        Nb<-200 
-The hyperparameter `S` `endsize` `rate` `Qthreshold` `Nb` refers to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
+The hyperparameters `S` `endsize` `rate` `Qthreshold` `Nb` refer to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
 
 ### 3. Run RFQT
 With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster commands as you prefer)
