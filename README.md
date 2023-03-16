@@ -70,7 +70,7 @@ Assign the hyperparameter values, for example
 The hyperparameter `S` `endsize` `rate` `Qthreshold` `Nb` refers to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
 
 ### 3. Run RFQT
-With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster command according to your preference)
+With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster commands as you prefer)
 
        howGX<-'const' 
        method<-'DR'; NDR<-20
@@ -82,3 +82,4 @@ With all hyperparameters defined and all data structures needed, run the followi
                                            'GetTree', 'GetNindex', 'GetIndex' )  ) 
        DR_RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting_real  ) 
        stopCluster(cl)
+Here we use the doubly-ranked stratification method with the pre-stratum size 20. 
