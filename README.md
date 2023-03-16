@@ -1,5 +1,5 @@
 # RFQT
-This repository merging to the main branch illustrates the key messages to draw the **Random Forest of Q trees (RFQT)** and its relevant analysis for treatment heterogeneity studies with Mendelian randomization, it can achieve a lots of work, including
+This text illustrates the key messages to draw the **Random Forest of Q trees (RFQT)** and its relevant analysis for treatment heterogeneity studies with Mendelian randomization, it can achieve a lots of work, including
 - Draw heterogeneity Q test 
 - Build single Q tree  
 - Build random forest of Q trees 
@@ -11,9 +11,9 @@ This repository merging to the main branch illustrates the key messages to draw 
 
 When drawing your treatment heterogeneity study, define the one-dimensional instrument *Z*, the exposure of interest *X*, the (high-dimensional) covariates *M*, and the outcome of interest *Y*. If the instrument is high-dimensional, first build the single instrument (e.g. by weighted gene score). The standard data structure regonized by RFQT is *>cbind(individual index, Z , X , Y, M)*.
 
-Below is the mind line to understand what RFQT did in each step and how the internal functions work, which is particularly helpful to those working on future methodology improvement. If you have a data and wish to implement RFQT to obtain the results with a step-by-step guidence, you may wish to see the final summary section.
+Below is the mind line to understand what RFQT did in each step and how the internal functions work, which is particularly helpful to those working on methodology improvement. If you have a data and wish to implement RFQT to obtain the results with a step-by-step guidance, you may wish to see the final summary section.
 
-## Toy example
+## Model and toy example
 Below is one heterogenous treatment example used for simulation considering 20 candidiate covariates where the first five covariates are the treatment effect modifiors  
 $$X = 0.5Z + 0.5 \sum_{j=1}^{20} U_j  + \epsilon_X $$ 
 $$M_j  =  b_j X + U_j \qquad j=1,2,\ldots,20 $$
@@ -108,7 +108,7 @@ Obtain VI meaasurements for all the candidiatw covariates
 
 One can do other analysis, like draw the permutation test
 
-       permutation_test(Dat,100) #100 is the number of peermutatin
+       permutation_test(Dat,100) #100 is the number of permutation
        
 or get the marginal covariate plot 
 
