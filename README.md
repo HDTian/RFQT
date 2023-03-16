@@ -93,14 +93,21 @@ Obtain indidividual predicts histogram
        predict_RFQT<-predict_matrix[, ncol( predict_matrix )]
        hist( predict_RFQT ,100, xlab='Predicted effect')
        
-Obtain MSE (only applicable if the true individual effects are known)
+Obtain MSE (only applicable if the true individual effects are known and inputed)
 
        MSE1<-getMSE( RES , 1 )  #MSE1: OOB error
        MSE2<-getMSE( RES , 2 )  #MSE2: test error
        
 Obtain VI meaasurements for all the candidiatw covariates 
 
-       VIindex<-getVI2(RES,'order')
+       getVI1(RES,'order')  
+       getVI2(RES,'order')  #for real data
 
+One can do other analysis, like draw the permutation test
 
+       permutation_test(Dat,100) #100 is the number of peermutatin
+       
+or get the marginal covariate plot 
+
+       marginal_covariate_MR( Dat,index,method ) #index is the covariate index one choose; method refers the stratification used
 
