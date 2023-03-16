@@ -52,12 +52,14 @@ Below is the steo-by-step no-lost guidence for those implementing RFQT with a da
 
 Depending on the type of data (simulation data or real application data) one wish to analyze, follow the coresponding guidance.
 
-### Build the standard data
-Prepare the standard data `Dat` where the first four colunms are individual index, instrument values, the exposure, the outcome, following the high-dimensional covariate information. If missing data exists, the individual will be removed. If one  wish to investigate potantial non-linear patterns, add the exposure itself as a covariate. 
+### 1. Build the standard data
+Prepare the standard data `Dat` where the first four colunms are individual index, instrument values, the exposure, the outcome, following the high-dimensional covariate information. If missing data exists, the individual will be removed. If one wish to investigate potential non-linear exposure effect patterns, add the exposure itself as a covariate. 
 
 For simulated data, the data strucuture is the same as the real data, only with the true individual effects added as the final column. One can use the command `getDat()` to obtain standard toy samples.
 
-### Define any hyperparameters
+If one wish to left a testing sub-set for validation and seperate analysis, simply split `Dat` as the training set `odat` and the testing set `vdat`.
+
+### 2. Define any hyperparameters
 Assign the hyperparameter values, for example
 
        S<-5  
@@ -65,4 +67,18 @@ Assign the hyperparameter values, for example
        rate<-round(JJ*2/5  )/JJ #JJ is the number of covariates   
        Qthreshold<-3.0
        Nb<-200 
-The hyperparameter `S` `endsize` 'rate' 'Qthreshold' 'Nb' refers to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
+The hyperparameter `S` `endsize` `rate` `Qthreshold` `Nb` refers to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
+
+### 3. Run RFQT
+With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster command according to your preference)
+
+       howGX<-'const' 
+       method<-'DR'; NDR<-20
+       cl<-makeCluster(n_cores_used)
+       clusterEvalQ(cl=cl , expr=library(dplyr))  
+       clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
+       clusterExport(  cl=cl ,  varlist=c( 'JJ','NNN', 'odat', 'vdat',  'method', 'NDR', 'rate', 'S' ,'Nb',
+                                           'howGX','const','endsize',
+                                           'GetTree', 'GetNindex', 'GetIndex' )  ) 
+       DR_RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting_real  ) 
+       stopCluster(cl)
