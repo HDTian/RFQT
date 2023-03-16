@@ -54,6 +54,10 @@ Below is the step-by-step no-lost guidance for those implementing RFQT with a da
 Depending on the type of data (simulation data or real application data) one wish to analyze, follow the coresponding guidance.
 
 ### 0. Load the package from GitHub
+       install.packages("devtools")
+       library(devtools)
+       install_github("HDTian/RFQT")
+       
 
 ### 1. Build the standard data
 Prepare the standard data `Dat` where the first four colunms are individual index, instrument values, the exposure, the outcome, following the high-dimensional covariate information. If missing data exists, the individual will be removed. If one wish to investigate potential non-linear exposure effect patterns, add the exposure itself as a covariate. 
