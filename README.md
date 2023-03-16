@@ -28,7 +28,7 @@ The schematic diagram is
 ![Q-tree1024_1](https://user-images.githubusercontent.com/127906571/225363783-32754381-27a3-45aa-9591-c2ea56bfd89b.jpg)
 Let `dat` be the standard data, simply  running `GetTree(dat)` to build a tree. It will return a dataset containing all individual information necessary for further analysis.
 ## Build RFQT
-One may need build RFQT to reduce variance of any estimator based on a single Q tree. RFQT is a multiple-fitting of Q tree with bootstrap data. The function `BootstrapTreeFitting` helps to bootstrap samples and return a list containing neccessary results, including testing/OOB individual effect preditons and VI measurements for the present bootstrap. To run RFQT, one need bootstrap many times and this may be time-consuming. One is suggested to use parallel computation like
+One may need build RFQT to reduce variance of any estimator based on a single Q tree. RFQT is a multiple-fitting of Q tree with bootstrap data. The function `BootstrapTreeFitting` or `BootstrapTreeFitting_real` helps to bootstrap samples and return a list containing neccessary results, including testing/OOB individual effect preditons and VI measurements for the present bootstrap. To run RFQT, one need bootstrap many times and this may be time-consuming. One is suggested to use parallel computation like
 
 
 
@@ -82,4 +82,25 @@ With all hyperparameters defined and all data structures needed, run the followi
                                            'GetTree', 'GetNindex', 'GetIndex' )  ) 
        DR_RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting_real  ) 
        stopCluster(cl)
-Here we use the doubly-ranked stratification method with the pre-stratum size 20. 
+Here we use the doubly-ranked stratification method with the pre-stratum size 20. other stratification methods including the residual method (`method<-'Residual'`) and the naive method is allowed. 
+
+### 4. Obtain the results you wish
+`DR_RES` or `RES` contains lots of useful information that can be transformed to the metrics one need. Here are some scenarios:
+
+Obtain indidividual predicts histogram
+
+       predict_matrix<-getPredict( RES,2     )
+       predict_RFQT<-predict_matrix[, ncol( predict_matrix )]
+       hist( predict_RFQT ,100, xlab='Predicted effect')
+       
+Obtain MSE (only applicable if the true individual effects are known)
+
+       MSE1<-getMSE( RES , 1 )  #MSE1: OOB error
+       MSE2<-getMSE( RES , 2 )  #MSE2: test error
+       
+Obtain VI meaasurements for all the candidiatw covariates 
+
+       VIindex<-getVI2(RES,'order')
+
+
+
