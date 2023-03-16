@@ -48,7 +48,7 @@ The permutation test is to assess the effect heterogeneity, accounting for uncer
 
 
 ## Step-to-Step guidance
-Below is the steo-by-step no-lost guidence for those implementing RFQT with a data.
+Below is the steo-by-step no-lost guidance for those implementing RFQT with a data.
 
 Depending on the type of data (simulation data or real application data) one wish to analyze, follow the coresponding guidance.
 
