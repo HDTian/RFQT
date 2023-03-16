@@ -5,7 +5,8 @@ This repository merging to the main branch illustrates the key messages to draw 
 - Build random forest of Q trees 
 - Make treatment effect prediction
 - Evaluate Variable Importance (VI) 
-- draw permutation test
+- Draw permutation test
+- Draw marginal heterogenous effect analysis for any covariates  
 
 
 When drawing your treatment heterogeneity study, define the one-dimensional instrument *Z*, the exposure of interest *X*, the (high-dimensional) covariates *M*, and the outcome of interest *Y*. If the instrument is high-dimensional, first build the single instrument (e.g. by weighted gene score). The standard data structure regonized by RFQT is *>cbind(individual index, Z , X , Y, M)*.
