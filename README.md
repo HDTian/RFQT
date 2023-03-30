@@ -67,7 +67,7 @@ If one wish to left a testing sub-set for validation and seperate analysis, simp
 ### 2. Define any hyperparameters
 Assign the hyperparameter values as in function arguments (i.e. in the local environment), for example
 
-       GetTree(dat, S = 5,endsize = 5000,rate=0.4, Qthreshold = 3,...) 
+       GetTree(dat, S = 5, endsize = 5000, rate = 0.4, Qthreshold = 3,...) 
        
 The hyperparameters `S` `endsize` `rate` `Qthreshold` refer to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split and the threshold value for Q statistic, respectively.
 
@@ -75,17 +75,18 @@ The hyperparameters `S` `endsize` `rate` `Qthreshold` refer to the maximun depth
 With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster commands as you prefer)
 
        library(parallel)
-
        n_cores_used<-detectCores()-1
-
        cl<-makeCluster(n_cores_used)
        clusterEvalQ(cl=cl , expr=library(dplyr))
        clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
        clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat','GetTree', 'GetNindex', 'GetIndex' )  )
-
        Nb<-n_cores_used
-
-       RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  ) ##RES are the RFQT fitting results
+       RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  ) 
+       
+       ## Or if you wish to use user-defined parameters like SoP=20, try
+       user_BootstrapTreeFitting<-function(seed){  RES<-BootstrapTreeFitting(seed,SoP=20);  return(RES)  }
+       clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat', 'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
+       RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting  ) 
 
        stopCluster(cl)
 Here we use the doubly-ranked stratification method with the pre-stratum size 10 (defalut values). Other stratification methods including the residual method (`method<-'Residual'`) and the naive method is allowed. 
