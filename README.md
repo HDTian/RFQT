@@ -67,11 +67,11 @@ For simulated data, the data strucuture is the same as the real data, only with 
 If one wish to left a testing sub-set for validation and seperate analysis, simply split `Dat` as the training set `odat` and the testing set `vdat`.
 
 ### 2. Define any hyperparameters
-Assign the hyperparameter values, for example
+Assign the hyperparameter values in the global environment, for example
 
        S<-5  
        endsize<-5000 
-       rate<-round(JJ*2/5  )/JJ #JJ is the number of covariates   
+       rate<-0.4
        Qthreshold<-3.0
        Nb<-200 
 The hyperparameters `S` `endsize` `rate` `Qthreshold` `Nb` refer to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
@@ -79,20 +79,24 @@ The hyperparameters `S` `endsize` `rate` `Qthreshold` `Nb` refer to the maximun 
 ### 3. Run RFQT
 With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster commands as you prefer)
 
-       howGX<-'const' 
-       method<-'DR'; NDR<-20
+       library(parallel)
+
+       n_cores_used<-detectCores()-1
+
        cl<-makeCluster(n_cores_used)
-       clusterEvalQ(cl=cl , expr=library(dplyr))  
+       clusterEvalQ(cl=cl , expr=library(dplyr))
        clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
-       clusterExport(  cl=cl ,  varlist=c( 'JJ','NNN', 'odat', 'vdat',  'method', 'NDR', 'rate', 'S' ,'Nb',
-                                           'howGX','const','endsize',
-                                           'GetTree', 'GetNindex', 'GetIndex' )  ) 
-       DR_RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting_real  ) 
+       clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat','GetTree', 'GetNindex', 'GetIndex' )  )
+
+       Nb<-n_cores_used
+
+       RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  ) ##RES are the RFQT fitting results
+
        stopCluster(cl)
-Here we use the doubly-ranked stratification method with the pre-stratum size 20. other stratification methods including the residual method (`method<-'Residual'`) and the naive method is allowed. 
+Here we use the doubly-ranked stratification method with the pre-stratum size 10 (defalut values). Other stratification methods including the residual method (`method<-'Residual'`) and the naive method is allowed. 
 
 ### 4. Obtain the results you wish
-`DR_RES` or `RES` contains lots of useful information that can be transformed to the metrics one need. Here are some scenarios:
+`RES` contains lots of useful information that can be transformed to the metrics one need. Here are some scenarios:
 
 Obtain indidividual predicts histogram
 
@@ -121,6 +125,6 @@ or get the marginal covariate plot
 ### 5. Integrated commands
 One may wish to use an intergrated command to obtain certain results with the data inputed. One could use
 
-       RFQT_fitting_real(odat,vdat,hyperparameters_List,...)
+       RFQTfit(odat,vdat,...)
        
 where `odat` and `vdat` are generally the training set used for RFQT fitting and the testing set used for seperate analysis, divided from `Dat`. This integrated command returns the basic results (`RES`, predictions, VI measurements, etc). Be careful that this command could be time-costing.
