@@ -52,9 +52,13 @@ Below is the step-by-step no-lost guidance for those implementing RFQT with a da
 Depending on the type of data (simulation data or real application data) one wish to analyze, follow the coresponding guidance.
 
 ### 0. Load the package from GitHub
-       install.packages("devtools")
+       ibrary(MendelianRandomization)
+       library(tidyverse)
+       library(data.table) 
+       library(parallel) 
        library(devtools)
        install_github("HDTian/RFQT")
+       library(RFQT)
        
 
 ### 1. Build the standard data
