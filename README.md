@@ -65,14 +65,11 @@ For simulated data, the data strucuture is the same as the real data, only with 
 If one wish to left a testing sub-set for validation and seperate analysis, simply split `Dat` as the training set `odat` and the testing set `vdat`.
 
 ### 2. Define any hyperparameters
-Assign the hyperparameter values in the global environment, for example
+Assign the hyperparameter values as in function arguments (i.e. in the local environment), for example
 
-       S<-5  
-       endsize<-5000 
-       rate<-0.4
-       Qthreshold<-3.0
-       Nb<-200 
-The hyperparameters `S` `endsize` `rate` `Qthreshold` `Nb` refer to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
+       GetTree(dat, S = 5,endsize = 5000,rate=0.4, Qthreshold = 3,...) 
+       
+The hyperparameters `S` `endsize` `rate` `Qthreshold` refer to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split and the threshold value for Q statistic, respectively.
 
 ### 3. Run RFQT
 With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster commands as you prefer)
