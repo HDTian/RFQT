@@ -34,10 +34,8 @@ One may need build RFQT to reduce variance of any estimator based on a single Q 
 
 
        cl<-makeCluster(n_cores_used)
-       clusterExport(  cl=cl ,  varlist=c( 'JJ','NNN', 'odat', 'vdat',  'method', 'NDR', 'rate', 'S' ,
-                                      'howGX','const','endsize',
-                                      'GetTree', 'GetNindex', 'GetIndex' )  ) 
-       RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
+       clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat','GetTree', 'GetNindex', 'GetIndex' )  )
+       RES<-parSapply(   cl ,  1:100, BootstrapTreeFitting  ) ##RES are the RFQT fitting results
 
 `RES` contains individual results for all bootstrap Q trees, and it will be used as the further analysis.
 
