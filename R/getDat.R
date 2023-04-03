@@ -3,7 +3,7 @@
 
 #按照论文里的Model生成一组well-regonized standard data
 
-#就是原石代码里的1scenarioAk,即论文里的scenarioB
+#就是原始代码里的scenarioA,即论文里的scenarioB
 getDat<-function(N=150000,
                 Nt=100000,
                 Nc=20, #Nc: number of candidate variables
