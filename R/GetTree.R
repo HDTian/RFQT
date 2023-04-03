@@ -17,6 +17,7 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
   dat$Nindex<-0 #最开始先提供统一的Nindex
   NDR<-SoP
   NNN<-nrow(dat)
+  Ns<-2 #在RFQT中，一直只用2个strata
   for(s in 1:S){  #S: total  split times
     infvec<-rep(NA,NNN)  # information vector; 最后加到dat上，作为reference table
     #很棒，这解决了我的一个担忧：是每次S生长时，重新全部设空一次infvec
@@ -39,12 +40,20 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
           ###DR---
           dat_current$Mobj<-dat_current[,4+J_] #J-th M的值； 注意前4项是I Z X Y
           dat_order<-dat_current[ order(dat_current[,2]  ),  ]  #ordered by Z
-          No<-round(N/NDR)  #NDR是我们想控制的！ 含义和N/No类似：代表着每个pre-strata中individual的数量
-          dat_order$pre_strata<- sort(    rep(1:No, length.out=N)  )      #No: # of pre-strata ; 不用纠结N/No是否为整数或者双数
-          temp<-arrange(  dat_order, Mobj )  #此时Mobj为目标量！
-          dat_order<-arrange(  temp ,pre_strata ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
-
-          dat_order$strata<-as.vector( unlist(    sapply( as.numeric(table( dat_order$pre_strata ))    ,    function(x) sort(rep(  1:2, length.out=x ))    )   ) )
+          
+          dat_order$pre_stratum<-    rep(1:(floor(N/SoP)+1), each=SoP,length.out=N)     
+          #(floor(N/SoP)+1)*SoP >= N 保证能超过就行
+          #rank twice (ie doubly-ranked)
+          temp<-arrange(  dat_order, Mobj )  #按照Mobj升序排一下  #arrange()应该也没有随机性
+          dat_order<-arrange(  temp ,pre_stratum ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
+          dat_order$strata<-as.vector( unlist(sapply( as.numeric(table( dat_order$pre_stratum )) , function(x) sort(rep(1:Ns,length.out=x)) )   ) )
+          
+          # No<-round(N/NDR)  #NDR是我们想控制的！ 含义和N/No类似：代表着每个pre-strata中individual的数量
+          # dat_order$pre_strata<- sort(    rep(1:No, length.out=N)  )      #No: # of pre-strata ; 不用纠结N/No是否为整数或者双数
+          # temp<-arrange(  dat_order, Mobj )  #此时Mobj为目标量！
+          # dat_order<-arrange(  temp ,pre_strata ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
+          # dat_order$strata<-as.vector( unlist(    sapply( as.numeric(table( dat_order$pre_strata ))    ,    function(x) sort(rep(  1:2, length.out=x ))    )   ) )
+          
           INFvect<-rep(NA,N)
           INFvect[dat_order$strata==1  ]<-paste0( J_ , '_' , 1, '_', mean( dat_order$Mobj[dat_order$strata==1] ) )
           INFvect[dat_order$strata==2  ]<-paste0( J_ , '_' , 2, '_', mean( dat_order$Mobj[dat_order$strata==2] ) )
@@ -54,9 +63,14 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
           if(method=='Residual'){
             ###Residual---
             dat_current$Mobj<-dat_current[,4+J_] #J-th M的值； 注意前4项是I Z X Y
-            dat_order<-dat_current[ order(dat_current[,2]  ),  ]  #ordered by Z
+            dat_order<-dat_current#[ order(dat_current[,2]  ),  ]  #ordered by Z
             dat_order$residual<-dat_order$Mobj-lm(  dat_order$Mobj~dat_order$Z   )$fitted
-            dat_order$strata<-  floor( (rank( dat_order$residual,ties.method ='random' )/((N/2)+0.000000001) ) )+1 #N为奇数也不要紧啊
+            
+            dat_order<-dat_order[  order(dat_order$residual  )  ,  ] #ordered by residuals
+            dat_order$strata<- sort(    rep(1:Ns, length.out=N)  )#一定可以控制Ns
+            
+            #dat_order$strata<-  floor( (rank( dat_order$residual,ties.method ='random' )/((N/2)+0.000000001) ) )+1 #N为奇数也不要紧啊
+            
             INFvect<-rep(NA,N)
             INFvect[dat_order$strata==1  ]<-paste0( J_ , '_' , 1, '_', mean( dat_order$Mobj[dat_order$strata==1] ) )
             INFvect[dat_order$strata==2  ]<-paste0( J_ , '_' , 2, '_', mean( dat_order$Mobj[dat_order$strata==2] ) )
@@ -65,8 +79,13 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
           }else{
             ###Naive rank---
             dat_current$Mobj<-dat_current[,4+J_] #J-th M的值； 注意前4项是I Z X Y
-            dat_order<-dat_current[ order(dat_current[,2]  ),  ]  #ordered by Z
-            dat_order$strata<-  floor( (rank( dat_order$Mobj,ties.method ='random' )/((N/2)+0.000000001) ) )+1
+            dat_order<-dat_current#[ order(dat_current[,2]  ),  ]  #ordered by Z
+            
+            dat_order<-dat_order[  order(dat_order$Mobj  )  ,  ] #ordered by Mobj
+            dat_order$strata<- sort(    rep(1:Ns, length.out=N)  )#一定可以控制Ns
+            
+            #dat_order$strata<-  floor( (rank( dat_order$Mobj,ties.method ='random' )/((N/2)+0.000000001) ) )+1
+            
             INFvect<-rep(NA,N)
             INFvect[dat_order$strata==1  ]<-paste0( J_ , '_' , 1, '_', mean( dat_order$Mobj[dat_order$strata==1] ) )
             INFvect[dat_order$strata==2  ]<-paste0( J_ , '_' , 2, '_', mean( dat_order$Mobj[dat_order$strata==2] ) )
@@ -90,7 +109,7 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
     names(dat)[dim(dat)[2]    ]<-paste0( 'infvec_',s  ) #最后一项换个名字，防止重名导致无法使用arrange
   }
   #Reference table
-  rdat<-dat #rdat和dat一致  #不需要用subdata: dat[, ( (dim(dat)[2]-S+1)  :   (dim(dat)[2]) )]
+  rdat<-dat #rdat和dat一致 #rdat是dat的增广矩阵  #不需要用subdata: dat[, ( (dim(dat)[2]-S+1)  :   (dim(dat)[2]) )]
 
   return(rdat)
 }
