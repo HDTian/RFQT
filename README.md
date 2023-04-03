@@ -1,12 +1,13 @@
 # RFQT
-This text illustrates the key messages to draw the **Random Forest of Q trees (RFQT)** and its relevant analysis for treatment heterogeneity studies with Mendelian randomization, it can achieve a lots of work, including
+This text illustrates the key messages to draw the **Random Forest of Q trees (RFQT)** and its relevant analysis for treatment heterogeneity studies with Mendelian randomization, it can achieve lots of work, including
 - Draw heterogeneity Q test 
 - Build single Q tree  
 - Build random forest of Q trees 
 - Make treatment effect prediction
 - Evaluate Variable Importance (VI) 
 - Draw permutation test
-- Draw marginal heterogenous effect analysis for any covariates  
+- Draw marginal heterogenous effect analysis for any covariates
+- Identify high-risk sub-group
 
 
 When drawing your treatment heterogeneity study, define the one-dimensional instrument *Z*, the exposure of interest *X*, the (high-dimensional) covariates *M*, and the outcome of interest *Y*. If the instrument is high-dimensional, first build the single instrument (e.g. by weighted gene score). The standard data structure regonized by RFQT is *>cbind(individual index, Z , X , Y, M)*.
