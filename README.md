@@ -1,12 +1,13 @@
 # RFQT
-This text illustrates the key messages to draw the **Random Forest of Q trees (RFQT)** and its relevant analysis for treatment heterogeneity studies with Mendelian randomization, it can achieve a lots of work, including
+This text illustrates the key messages to draw the **Random Forest of Q trees (RFQT)** and its relevant analysis for treatment heterogeneity studies with Mendelian randomization, it can achieve lots of work, including
 - Draw heterogeneity Q test 
 - Build single Q tree  
 - Build random forest of Q trees 
 - Make treatment effect prediction
 - Evaluate Variable Importance (VI) 
 - Draw permutation test
-- Draw marginal heterogenous effect analysis for any covariates  
+- Draw marginal heterogenous effect analysis for any covariates
+- Identify high-risk sub-group
 
 
 When drawing your treatment heterogeneity study, define the one-dimensional instrument *Z*, the exposure of interest *X*, the (high-dimensional) covariates *M*, and the outcome of interest *Y*. If the instrument is high-dimensional, first build the single instrument (e.g. by weighted gene score). The standard data structure regonized by RFQT is *>cbind(individual index, Z , X , Y, M)*.
@@ -34,10 +35,8 @@ One may need build RFQT to reduce variance of any estimator based on a single Q 
 
 
        cl<-makeCluster(n_cores_used)
-       clusterExport(  cl=cl ,  varlist=c( 'JJ','NNN', 'odat', 'vdat',  'method', 'NDR', 'rate', 'S' ,
-                                      'howGX','const','endsize',
-                                      'GetTree', 'GetNindex', 'GetIndex' )  ) 
-       RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
+       clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat','GetTree', 'GetNindex', 'GetIndex' )  )
+       RES<-parSapply(   cl ,  1:100, BootstrapTreeFitting  ) ##RES are the RFQT fitting results
 
 `RES` contains individual results for all bootstrap Q trees, and it will be used as the further analysis.
 
@@ -53,10 +52,14 @@ Below is the step-by-step no-lost guidance for those implementing RFQT with a da
 
 Depending on the type of data (simulation data or real application data) one wish to analyze, follow the coresponding guidance.
 
-### 0. Load the package from GitHub
-       install.packages("devtools")
+### 0. Load the RFQT package from GitHub
+       library(MendelianRandomization)
+       library(tidyverse)
+       library(data.table) 
+       library(parallel) 
        library(devtools)
        install_github("HDTian/RFQT")
+       library(RFQT)
        
 
 ### 1. Build the standard data
@@ -67,32 +70,34 @@ For simulated data, the data strucuture is the same as the real data, only with 
 If one wish to left a testing sub-set for validation and seperate analysis, simply split `Dat` as the training set `odat` and the testing set `vdat`.
 
 ### 2. Define any hyperparameters
-Assign the hyperparameter values, for example
+Assign the hyperparameter values as in function arguments (i.e. in the local environment), for example
 
-       S<-5  
-       endsize<-5000 
-       rate<-round(JJ*2/5  )/JJ #JJ is the number of covariates   
-       Qthreshold<-3.0
-       Nb<-200 
-The hyperparameters `S` `endsize` `rate` `Qthreshold` `Nb` refer to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split, the threshold value for Q statistic and the number of bootstraping/Q-trees in RFQT, respectively.
+       GetTree(dat, S = 5, endsize = 5000, rate = 0.4, Qthreshold = 3,...) 
+       
+The hyperparameters `S` `endsize` `rate` `Qthreshold` refer to the maximun depth of Q-tree, the minimal size of end node, the proportion of covariates considered in each split and the threshold value for Q statistic, respectively.
 
 ### 3. Run RFQT
 With all hyperparameters defined and all data structures needed, run the following codes to fit a RFQT (you can use other cluster commands as you prefer)
 
-       howGX<-'const' 
-       method<-'DR'; NDR<-20
+       library(parallel)
+       n_cores_used<-detectCores()-1
        cl<-makeCluster(n_cores_used)
-       clusterEvalQ(cl=cl , expr=library(dplyr))  
+       clusterEvalQ(cl=cl , expr=library(dplyr))
        clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
-       clusterExport(  cl=cl ,  varlist=c( 'JJ','NNN', 'odat', 'vdat',  'method', 'NDR', 'rate', 'S' ,'Nb',
-                                           'howGX','const','endsize',
-                                           'GetTree', 'GetNindex', 'GetIndex' )  ) 
-       DR_RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting_real  ) 
+       clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat','GetTree', 'GetNindex', 'GetIndex' )  )
+       Nb<-n_cores_used
+       RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  ) 
+       
+       ## Or if you wish to use user-defined parameters like SoP=20, try
+       user_BootstrapTreeFitting<-function(seed){  RES<-BootstrapTreeFitting(seed,SoP=20);  return(RES)  }
+       clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat', 'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
+       RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting  ) 
+
        stopCluster(cl)
-Here we use the doubly-ranked stratification method with the pre-stratum size 20. other stratification methods including the residual method (`method<-'Residual'`) and the naive method is allowed. 
+Here we use the doubly-ranked stratification method with the pre-stratum size 10 (defalut values). Other stratification methods including the residual method (`method<-'Residual'`) and the naive method is allowed. 
 
 ### 4. Obtain the results you wish
-`DR_RES` or `RES` contains lots of useful information that can be transformed to the metrics one need. Here are some scenarios:
+`RES` contains lots of useful information that can be transformed to the metrics one need. Here are some scenarios:
 
 Obtain indidividual predicts histogram
 
@@ -121,6 +126,6 @@ or get the marginal covariate plot
 ### 5. Integrated commands
 One may wish to use an intergrated command to obtain certain results with the data inputed. One could use
 
-       RFQT_fitting_real(odat,vdat,hyperparameters_List,...)
+       RFQTfit(odat,vdat,...)
        
 where `odat` and `vdat` are generally the training set used for RFQT fitting and the testing set used for seperate analysis, divided from `Dat`. This integrated command returns the basic results (`RES`, predictions, VI measurements, etc). Be careful that this command could be time-costing.
