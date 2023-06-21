@@ -1,30 +1,32 @@
 ###
-###GetTree    #get a single tree fitting
-###
+###GetTree    #construct a single Q-tree
+###return: rdat (the rdat contains the decision rule)
 
-GetTree<-function(dat,#input: the training set; must be data.frame ; return: rdat
-                  S=5, #only makes sense for GetTree
-                  Qthreshold=3.0,#only makes sense for GetTree
-                  rate=1,
+GetTree<-function(dat,#input: the data set (either training dats or tree data);  must be data.frame ;
+                  S=5, #the largest depth #only makes sense for GetTree
+                  Qthreshold=3.0,#the threshold for Q heterogneity assessment #only makes sense for GetTree
+                  rate=1,# the proportion of candidate variables Ms considered
                   method='DR',
-                  SoP=10,
-                  howGX='SpecificGX',
-                  const=NA,
-                  endsize=5000 #only makes sense for GetTree
+                  SoP=10, #size of pre-stratum #only make sense to DR stratification
+                  howGX='SpecificGX',#'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                  const=NA, #only make sense when howGX='const'
+                  endsize=5000 #the two-times of the minimual size of the node of Q-tree. S and endsize work in a similar way. #only makes sense for GetTree
                   ){
   #先定义一个JJ；这个JJ是给Getindex用的
-  if( is.null(dat$true_STE[1]) ){JJ<-ncol( dat )-4}else{JJ<-ncol( dat )-5}
-  dat$Nindex<-0 #最开始先提供统一的Nindex
+  if( is.null(dat$true_STE[1]) ){JJ<-ncol( dat )-4}else{JJ<-ncol( dat )-5}#如果是sim data，就减去5，否则减去4
+  dat$Nindex<-0 #最开始先提供统一的Nindex: 0 #Nindex: 目前的Node index (对应着所有的current end node)
   NDR<-SoP
   NNN<-nrow(dat)
   Ns<-2 #在RFQT中，一直只用2个strata
-  for(s in 1:S){  #S: total  split times
+  for(s in 1:S){  #S:the largest depth #s: the S round
     infvec<-rep(NA,NNN)  # information vector; 最后加到dat上，作为reference table
-    #很棒，这解决了我的一个担忧：是每次S生长时，重新全部设空一次infvec
+    #很棒，这解决了我的一个担忧：每次S生长时，会重新全部设空一次infvec
     #但还有一个问题：已经停止的node是否还需要再生长？
     Ls<-levels(factor(    dat$Nindex )    ) #一定要先存好，否则loop中会不断更新dat
     for(k in 1:length(Ls)  ){ #Nindex: Node index
+      #go to the specific Nindex subgroup/node
       dat_current<-dat[ abs( dat$Nindex-as.numeric(  Ls  )[k])<.Machine$double.eps^0.5 ,  ]
+      #get the best candidiate M for this node
       GIres<-GetIndex(dat_current,
                       JJ=JJ,
                       rate=rate,
@@ -36,6 +38,7 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
       #这里主要是告诉我们用哪个M的
       if( (GIres[2]>Qthreshold)&(  GIres[3]>endsize ) ){  #只有此时才会接着细分，否则不用管  (注意 final end node size >= endsize/2)
         N<-dim( dat_current )[1] #其实奇数也不要紧；rank无视单数奇数
+        #stratification; i.e. node split
         if(method=='DR'){
           ###DR---
           dat_current$Mobj<-dat_current[,4+J_] #J-th M的值； 注意前4项是I Z X Y
@@ -47,12 +50,6 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
           dat_order<-arrange(  temp ,pre_stratum ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
           dat_order$strata<-as.vector( unlist(sapply( as.numeric(table( dat_order$pre_stratum )) , function(x) sort(rep(1:Ns,length.out=x)) )   ) )
 
-          #
-          INFvect<-rep(NA,N)
-          INFvect[dat_order$strata==1  ]<-paste0( J_ , '_' , 1, '_', mean( dat_order$Mobj[dat_order$strata==1] ) )
-          INFvect[dat_order$strata==2  ]<-paste0( J_ , '_' , 2, '_', mean( dat_order$Mobj[dat_order$strata==2] ) )
-          dat_order$inf<-INFvect
-          cuttingvalue<-  (mean( dat_order$Mobj[dat_order$strata==1] ) +  mean( dat_order$Mobj[dat_order$strata==2] ) )/2
         }else{
           if(method=='Residual'){
             ###Residual---
@@ -63,12 +60,6 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
             dat_order<-dat_order[  order(dat_order$residual  )  ,  ] #ordered by residuals
             dat_order$strata<- sort(    rep(1:Ns, length.out=N)  )#一定可以控制Ns
 
-            #
-            INFvect<-rep(NA,N)
-            INFvect[dat_order$strata==1  ]<-paste0( J_ , '_' , 1, '_', mean( dat_order$Mobj[dat_order$strata==1] ) )
-            INFvect[dat_order$strata==2  ]<-paste0( J_ , '_' , 2, '_', mean( dat_order$Mobj[dat_order$strata==2] ) )
-            dat_order$inf<-INFvect
-            cuttingvalue<-  (mean( dat_order$Mobj[dat_order$strata==1] ) +  mean( dat_order$Mobj[dat_order$strata==2] ) )/2
           }else{
             ###Naive rank---
             dat_current$Mobj<-dat_current[,4+J_] #J-th M的值； 注意前4项是I Z X Y
@@ -77,34 +68,46 @@ GetTree<-function(dat,#input: the training set; must be data.frame ; return: rda
             dat_order<-dat_order[  order(dat_order$Mobj  )  ,  ] #ordered by Mobj
             dat_order$strata<- sort(    rep(1:Ns, length.out=N)  )#一定可以控制Ns
 
-            #
-            INFvect<-rep(NA,N)
-            INFvect[dat_order$strata==1  ]<-paste0( J_ , '_' , 1, '_', mean( dat_order$Mobj[dat_order$strata==1] ) )
-            INFvect[dat_order$strata==2  ]<-paste0( J_ , '_' , 2, '_', mean( dat_order$Mobj[dat_order$strata==2] ) )
-            dat_order$inf<-INFvect
-            cuttingvalue<-  (mean( dat_order$Mobj[dat_order$strata==1] ) +  mean( dat_order$Mobj[dat_order$strata==2] ) )/2
           }
         }
 
-        ###storage into dat---
+        ##split/tree information storage
+        INFvect<-rep(NA,N)
+        INFvect[dat_order$strata==1  ]<-paste0( J_ , '_' , 1, '_', mean( dat_order$Mobj[dat_order$strata==1] ) )#1: lower M, left node
+        INFvect[dat_order$strata==2  ]<-paste0( J_ , '_' , 2, '_', mean( dat_order$Mobj[dat_order$strata==2] ) )#2: upper M, right node
+        dat_order$inf<-INFvect
+        #cuttingvalue<-  (mean( dat_order$Mobj[dat_order$strata==1] ) +  mean( dat_order$Mobj[dat_order$strata==2] ) )/2
+        #this cuttingvalue means new input will go to the node that has more closer mean M value
+
+        ###storage/merge into dat---
         #update the Nindex
         dat_current<-arrange(  dat_order, I )  #最后按照I排序，方便融入dat中; #dat_current$I 中肯定不包含Iindex
         vect<-rep(0,NNN)  #NNN为dat (total) sample size
-        vect[(dat$I)%in%(dat_current$I )]<-dat_current$strata*0.1^s
+        vect[(dat$I)%in%(dat_current$I )]<-dat_current$strata*0.1^s #times 0.1^s 相当于在Nindex后面添上新的tree information
         #update the Nindex
-        dat$Nindex<-dat$Nindex+vect
+        dat$Nindex<-dat$Nindex+vect#dat是total dat
         #update infvec
         infvec[  (dat$I)%in%(dat_current$I )  ]<- dat_current$inf  #其实和Nindex应该要匹配
-      }
-    }
+      } #end of single node split in the current end node situation
+    } #end of all node split in the present S round
+
+    ###added the infvec representing the current s round
     dat<-cbind( dat , infvec )  #不用管NA项目，反正都是 给定Nindex具体值再做处理
-    names(dat)[dim(dat)[2]    ]<-paste0( 'infvec_',s  ) #最后一项换个名字，防止重名导致无法使用arrange
-  }
-  #Reference table
-  rdat<-dat #rdat和dat一致 #rdat是dat的增广矩阵  #不需要用subdata: dat[, ( (dim(dat)[2]-S+1)  :   (dim(dat)[2]) )]
+    names(dat)[dim(dat)[2]    ]<-paste0( 'infvec_',s  ) #给最后一项换个名字，防止重名导致无法使用arrange
+  } #end of all S round; the tree stop growing
+  ###final Reference table
+  rdat<-dat #rdat和dat一致 #rdat是dat的增广矩阵(包含每轮s生长的tree information)  #不需要用subdata: dat[, ( (dim(dat)[2]-S+1)  :   (dim(dat)[2]) )]
 
   return(rdat)
 }
 
 
-#返回一个和inputed dat增广的dat set
+#返回一个和inputed dat增广的dat set(包含每轮s生长的tree information)
+
+###exmaples:
+set.seed(60)
+res<-getDat() #simulated data
+odat<-res$traning.set  #training set
+vdat<-res$testing.set  #testing set
+tree_result<-GetTree(odat)
+

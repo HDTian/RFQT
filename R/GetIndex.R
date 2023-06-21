@@ -5,12 +5,12 @@
 GetIndex<-function(dat_current,#dat_current: current data
                    JJ,#the number of total candidate variables
                    rate=1,# rate: the proportion of M considered
-                   method='DR',
+                   method='DR',#stratification method used
                    SoP=10,#size of pre-stratum
-                   howGX='SpecificGX',
+                   howGX='SpecificGX', #how to caculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                    const=NA){
   N<-dim( dat_current )[1]
-  #getIndex这个函数不适合通过dat_current来计算JJ，因为在tree growth中，dat_current会不断增广
+  ###getIndex这个函数不适合通过dat_current来计算JJ，因为在tree growth中，dat_current会不断增广
   #JJ是GetIndex这个函数外已经被定义的量
   if((rate>1)|(rate<=0)){ stop('PLease use a correct rate (0<= rate <1)')}
   J<-round(rate*JJ)
@@ -58,7 +58,7 @@ GetIndex<-function(dat_current,#dat_current: current data
     Bx1<-c(); Bxse1<-c(); By1<-c() ; Byse1<-c()  #这些来算Q足矣
     for(i in 1:Ns){
       dat_sub<-dat_order[dat_order$strata==i,]
-      Means<-rbind(Means,summary(dat_sub$Mobj  ) )
+      #Means<-rbind(Means,summary(dat_sub$Mobj  ) )
       if(howGX=='const'){
         if(is.na(const)){stop('You use a constant GX association, please tell me the constant value by const=my.const ' ) }
         bx<-const#population估计出来的G-X effect
@@ -87,5 +87,20 @@ GetIndex<-function(dat_current,#dat_current: current data
   names(results  )<-c(  'Candidate.index', 'Q.value' , 'node.size' )
   return( results) #返回M编号 和 最大的Q值 和此时date (没分之前的)sample size [这两个用在stoping rule]
 }
-#返回M编号 和 最大的Q值 和此时date (没分之前的)sample size [这两个用在stoping rule]
+#返回 1.M编号 和 2.对应的最大的Q值 和 3.此时date (没分之前的)sample size [这两个用在stoping rule]
+
+###exmaples:
+set.seed(60)
+res<-getDat() #simulated data
+odat<-res$traning.set  #training set
+vdat<-res$testing.set  #testing set
+GetIndex(odat,JJ=20)
+#Candidate.index         Q.value       node.size
+#         3.0000        324.7219     100000.0000
+
+
+
+
+
+
 
