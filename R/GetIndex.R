@@ -1,15 +1,14 @@
 
-#dat_current : usually the training data
+#GetIndex:accodring to the current data, return the best candidate M (i.e. the most possible modifiers)
 
-#NDR就是SoP
 
-GetIndex<-function(dat_current,
-                   JJ,
-                   rate=1,
+GetIndex<-function(dat_current,#dat_current: current data
+                   JJ,#the number of total candidate variables
+                   rate=1,# rate: the proportion of M considered
                    method='DR',
-                   SoP=10,
+                   SoP=10,#size of pre-stratum
                    howGX='SpecificGX',
-                   const=NA){#dat_current: current data; rate: the proportion of M considered
+                   const=NA){
   N<-dim( dat_current )[1]
   #getIndex这个函数不适合通过dat_current来计算JJ，因为在tree growth中，dat_current会不断增广
   #JJ是GetIndex这个函数外已经被定义的量
@@ -20,24 +19,19 @@ GetIndex<-function(dat_current,
   #print(Mcandidates)
   QQs<-c()
   Ns<-2 #在RFQT中，一直只用2个strata
-  for(j in Mcandidates){#J: the number of total variables Ms (注意，每一次search都要用随机的partial M candidates，为了de-correlation trees in random forest)
+  for(j in Mcandidates){#J: the number of variables Ms considered (注意，每一次search都要用随机的partial M candidates，为了de-correlation trees in random forest)
     if(method=='DR'){
       ###DR---
       dat_current$Mobj<-dat_current[,4+j] #J-th M的值； 注意前4项是I Z X Y
       dat_order<-dat_current[ order(dat_current[,2]  ),  ]  #ordered by Z
 
-      dat_order$pre_stratum<-    rep(1:(floor(N/SoP)+1), each=SoP,length.out=N)
-      #(floor(N/SoP)+1)*SoP >= N 保证能超过就行
+      dat_order$pre_stratum<-    rep(1:(floor(N/SoP)+1), each=SoP,length.out=N)#(floor(N/SoP)+1)*SoP >= N 保证能超过就行
+
       #rank twice (ie doubly-ranked)
       temp<-arrange(  dat_order, Mobj )  #按照Mobj升序排一下  #arrange()应该也没有随机性
       dat_order<-arrange(  temp ,pre_stratum ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
       dat_order$strata<-as.vector( unlist(sapply( as.numeric(table( dat_order$pre_stratum )) , function(x) sort(rep(1:Ns,length.out=x)) )   ) )
 
-      # No<-round(N/SoP)  #NDR是我们想控制的！ 含义和N/No类似：代表着每个pre-strata中individual的数量
-      # dat_order$pre_strata<- sort(    rep(1:No, length.out=N)  )      #No: # of pre-strata ; 不用纠结N/No是否为整数或者双数
-      # temp<-arrange(  dat_order, Mobj )  #此时Mobj为目标量！
-      # dat_order<-arrange(  temp ,pre_strata ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
-      # dat_order$strata<-as.vector( unlist(    sapply( as.numeric(table( dat_order$pre_strata ))    ,    function(x) sort(rep(  1:2, length.out=x ))    )   ) )
     }else{
       if(method=='Residual'){
         ###Residual---
@@ -48,7 +42,6 @@ GetIndex<-function(dat_current,
         dat_order<-dat_order[  order(dat_order$residual  )  ,  ] #ordered by residuals
         dat_order$strata<- sort(    rep(1:Ns, length.out=N)  )#一定可以控制Ns
 
-        #dat_order$strata<-  floor( (rank( dat_order$residual,ties.method ='random' )/((N/2)+0.000000001) ) )+1 #N为奇数也不要紧啊
       }else{
         ###Naive rank---
         dat_current$Mobj<-dat_current[,4+j] #J-th M的值； 注意前4项是I Z X Y
@@ -57,13 +50,12 @@ GetIndex<-function(dat_current,
         dat_order<-dat_order[  order(dat_order$Mobj  )  ,  ] #ordered by Mobj
         dat_order$strata<- sort(    rep(1:Ns, length.out=N)  )#一定可以控制Ns
 
-        #dat_order$strata<-  floor( (rank( dat_order$Mobj,ties.method ='random' )/((N/2)+0.000000001) ) )+1
       }
     }
 
     ###IV estimates---
-    RES<-c();Means<-c()
-    Bx1<-c(); Bxse1<-c(); By1<-c() ; Byse1<-c()  #这三个是用来算Q的
+    #RES<-c();Means<-c()
+    Bx1<-c(); Bxse1<-c(); By1<-c() ; Byse1<-c()  #这些来算Q足矣
     for(i in 1:Ns){
       dat_sub<-dat_order[dat_order$strata==i,]
       Means<-rbind(Means,summary(dat_sub$Mobj  ) )
@@ -76,10 +68,10 @@ GetIndex<-function(dat_current,
       }
       fitGY<-lm(    dat_sub[,4]~  dat_sub[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
       Bx1<-c( Bx1, bx  ); Bxse1<-c( Bxse1, bxse  ); By1<-c(By1, by  ) ; Byse1<-c(  Byse1,  byse)
-      MRres<-mr_ivw(mr_input(bx, bxse, by, byse)); res1<-c(MRres@Estimate , MRres@StdError)
-      RES<-rbind( RES,   c( res1 )   )
+      #MRres<-mr_ivw(mr_input(bx, bxse, by, byse)); res1<-c(MRres@Estimate , MRres@StdError)
+      #RES<-rbind( RES,   c( res1 )   )
     }
-    RES;Means
+    #RES;Means
 
     ###Q statistic---
     Sr<-mr_ivw(mr_input(Bx1, (1:2) , By1, Byse1))#先算effect via naive IVW under null (no effect difference)

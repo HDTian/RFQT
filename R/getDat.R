@@ -17,7 +17,7 @@ getDat<-function(N=150000,
   NNNN<-N; NNN<-Nt
   Z<-rnorm(NNNN,0,1)
   e1<-rnorm(NNNN,0,1);e2<-rnorm(NNNN,0,1) #one for exposure, one for outcome
-  JJ<-Nc #好的，现在我们直接考虑30个  #JJ: candidate variable的数量
+  JJ<-Nc   #JJ: candidate variable的数量
   UU<-matrix(   rnorm( NNNN*JJ,0,1  ), NNNN ,JJ    )
   X<-ZXeffect*Z+UU%*%rep(0.5,JJ)+e1
 
