@@ -1,5 +1,5 @@
 ###
-###GetNindex: get Node index for new input samples
+###GetNindex: get the (end-)Node index for a new input samples, based on a fitted Q tree
 ###
 
 #依据inputed rdat给any M 返回Nindex (Nindex: Node index)  (适用于任何M Input matrix)
@@ -45,4 +45,31 @@ rdat<-GetTree(odat)
 
 
 vdat_Nindex<-GetNindex(vdat[,5:24] ,rdat )#the M colnumber and order should be same as the training data
+
+
+#may use another independent data (estimation data) to calculate the endnode-specific IV/MR estimates
+
+#for example: let odat halves into trdata (tree data) and estdata (estimation data); also have rdat<-GetTree(trdata)
+
+trdat<-odat[1: (nrow(odat)/2) ,]#tree data
+estdat<-odat[(nrow(odat)/2+1):nrow(odat) ,] #estimaiton data
+
+rdat<-GetTree(trdat)#fitted Q tree
+
+estdat$Nindex<-GetNindex(estdat[,5:24] ,rdat )#rdat contains the tree information (i.e. decision rule)
+
+#according to estdata calculate the Nindex-specific MR estimates
+#后续的代码和BooststraptreeFitting一样
+
+
+
+
+
+
+
+
+
+
+
+
 
