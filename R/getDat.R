@@ -69,7 +69,7 @@ getDat<-function(N=150000,
 ##examples:
 
 set.seed(60)
-res<-getDat() #simulated data
+res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 

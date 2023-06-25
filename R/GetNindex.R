@@ -32,7 +32,7 @@ GetNindex<-function(M,  #variable information matrix; the M colnumber and order 
         #split style 1: 3 7
         #split style 2: 5 5
         #split style 3: 7 3
-        cuttingvalue<-( as.numeric( (sstring[[1]])[3] )*weight1+as.numeric( (sstring[[2]])[3] )*weight2 )/(weight1+weigth2)
+        cuttingvalue<-( as.numeric( (sstring[[1]])[3] )*weight1+as.numeric( (sstring[[2]])[3] )*weight2 )/(weight1+weight2)
         #----------------------------------------------------------------------------
         M_sub<-M[ round( theNindex,s-1  ) == Ls[k] ,]  #只考虑满足这一类的sub matrix
         #vector赋值(赋vector Nindex)
@@ -46,7 +46,7 @@ GetNindex<-function(M,  #variable information matrix; the M colnumber and order 
 
 ###examples:
 set.seed(60)
-res<-getDat() #simulated data
+res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 

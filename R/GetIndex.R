@@ -113,7 +113,7 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
 
 ###exmaples:
 set.seed(60)
-res<-getDat() #simulated data
+res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 GetIndex(odat,JJ=20)

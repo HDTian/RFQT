@@ -22,6 +22,14 @@ library(corrplot) #data cleaning需要，RFQT可以不需???
 rm(list=ls())
 
 
+
+###my function order:
+#getDat  (GetIndex->GetTree->GetNindex->BootstrapTreeFitting) (getMSE getPredict getVI)
+
+
+
+
+
 ######下面的内容是模拟使用这个包的人：(用在网页readme介绍)
 
 ###simulation部分

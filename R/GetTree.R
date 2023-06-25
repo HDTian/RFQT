@@ -125,7 +125,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
 
 ###exmaples:
 set.seed(60)
-res<-getDat() #simulated data
+res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 rdat<-GetTree(odat)
