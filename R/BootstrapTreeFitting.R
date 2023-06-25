@@ -11,32 +11,49 @@
 
 
 BootstrapTreeFitting<-function(seed=1,
-                               Odat=odat,  #inputed training data
-                               Vdat=vdat,  #inputed testing data
-                               honest=TRUE, #use honiest estimation or not?
+                               Odat=odat,  #inputted training data
+                               Vdat=vdat,  #inputted testing data  #Vdat can be empty or nonexistent, not defined
+                               honest=TRUE, #use honest estimation or not?
                                S=5,  #maximal depth
                                rate=0.4, # the proportion of candidate variables Ms considered
-                               Qthreshold=3.0, ##the threshold for Q heterogneity assessment
-                               method='DR',
+                               Qthreshold=3.84, ##the threshold for Q heterogneity assessment
+                               method='DR',#stratification method used
                                SoP=10, ##size of pre-stratum #only make sense to DR stratification
                                howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
-                               endsize=5000,##the two-times of the minimual size of the node of Q-tree. S and endsize work in a similar way. #only makes sense for GetTree
+                               endsize=5000,##the minimal size of the node of Q-tree allowed to exist
                                const=NA){ #boostrap一次odat得到OOB samples effect prediction;顺便vdat的prediction也做了
   if( is.null(Odat$true_STE[1]) ){JJ<-ncol( Odat )-4}else{JJ<-ncol( Odat )-5}
   if( JJ<1 ){ stop('No candidate covariate, or the dat is not regonized')  }
   #这个JJ主要是给后面的RES$vi用的，
   #至于treefitting中的splitting variable index选择，GetTree自己会再定义(但这两个定义的JJ当然得一样)
+
+
+  #check the IDindex in Odat is strictly increasing
+  #(因为最后返回的结果OOBpredict是和odat index顺序匹配的)
+  if(  sum((Odat$I[-1]-Odat$I[-length(Odat$I)])<=0)>0  ){
+    stop('the ID index of the inputed Odat is not strictly increasing: please first arrange them by yourself')
+  }
   ###Bootstrap一次------------------------------------------------------------------------
   set.seed(seed)
   NNN<-nrow(Odat)
   Bindex<-sample( 1:NNN, NNN , replace=TRUE)
-  dat<-Odat[Bindex, ]             #一次simulation中： 分为odat 和 vdat： odat就是training data！
-  dat$I<-1:NNN  #当成new data  reindexing ID   #dat就是odat bootstrapped后的for-tree-built的data
-  OOBdat<-Odat[  -as.numeric( levels( factor(Bindex  ) ) ), ]  #OOB error和Variable Importance的关键
+  bdat<-Odat[Bindex, ]  #bootstrapped data         #一次simulation中： 分为odat 和 vdat： odat就是training data！
+  bdat$I<-1:NNN  #当成new data and !reindexing! ID  #ID严格升序
+  #bdat就是odat bootstrapped后的for-tree-built的data (即可当作training dat or divide into treedat + estdat)
+  OOBdat<-Odat[  -as.numeric( levels( factor(Bindex  ) ) ), ]  #OOBdat的I是严格升序的
+  #OOB error和Variable Importance的关键
+  dat<-bdat
+
+  if(honest){ #honest estimation
+    #random split (注意：必须要random split；但是由于bootstrap index是随机的且没有sort,可以直接按照bdat的I顺序来分)
+    treedat<-bdat[(1:round(nrow(bdat)/2)),]#bdat的I是严格升序的
+    estdat<-bdat[-(1:round(nrow(bdat)/2)),]
+    dat<-treedat
+  }
 
 
   ###single tree fitting一次---------------------------------------------------------------
-  rdat<-GetTree( dat,  #把dat作为GetTree的输入  #dat可以为bootstrap后的trdat or直接odat
+  rdat<-GetTree( dat,  #把dat作为GetTree的输入  #dat可以为bdat或者的treedat或者直接odat
                  S=S,
                  rate=rate,
                  Qthreshold=Qthreshold,
@@ -47,29 +64,37 @@ BootstrapTreeFitting<-function(seed=1,
                  endsize=endsize)  #返回rdat这个data.frame  ;  GetTree是最耗时的function
 
   ###get the MR est for each Nindex based on this single tree fitting----------------------
+  ddat<-rdat #ddat是用来做Node/stratum-specific MR estimates
   NNindex<-as.numeric(  levels(     factor(   rdat$Nindex  )   )   )  #所有NNindex的种类
-  MRest<-rep( NA, length( NNindex ) ) #NNindex 和MRest的组合构成了tree的所有结果
+  #MRest vector  (same length and order as NNindex)
+  MRest<-rep( NA, length( NNindex ) ) #NNindex 和MRest的组合构成了tree的end node所有结果(decision rule由rdat提供)
   Bx<-c();Bxse<-c();By<-c(); Byse<-c() #为了分析stratum-specific G-X effect
   Sizeratio<-c()
   #此处注意下estdata；如果是odat，那么rdat是自带Nindex；如果是用estdata，那么先算一下estdata$Nindex的Nindex，然后替换rdat为estdat后续代码是一样的
+  if(honest){
+    #estdat Nindex
+    estdat$Nindex<-GetNindex(estdat[,5:(5+JJ-1)] ,rdat )#基于刚fit好的rdat来给estdat赋Nindex
+    ddat<-estdat
+  }
+  ###node/stratum-specific MR estimates
   if(howGX=='const'){
     if(is.na(const)){stop('You used a constant GX association, please tell me the constant value by const=my.const ' ) }
     bx<-const;bxse<-0
     for(nn in 1:length(NNindex)){
-      dat_sub<-rdat[abs(rdat$Nindex- NNindex[nn])< .Machine$double.eps^0.5,]#focus on the Nindex-specific subgroup
+      dat_sub<-ddat[abs(ddat$Nindex- NNindex[nn])< .Machine$double.eps^0.5,]#focus on the Nindex-specific subgroup
       fitGY<-lm(    dat_sub[,4]~  dat_sub[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
       Bx<-c(Bx  , bx   ) ;  Bxse<-c(Bxse,  bxse  ) ; By<- c(  By , by ) ; Byse<-c(  Byse, byse )
-      Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(rdat)   )  #for ts1  #注意honest style则把rdat换成estdat即可
+      Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(ddat)   )  #for ts1  #注意honest style不需要做变动
       MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
       MRest[nn]<-MRres@Estimate
     }
   }else{
     for(nn in 1:length(NNindex)){
-      dat_sub<-rdat[abs(rdat$Nindex- NNindex[nn])< .Machine$double.eps^0.5,]
+      dat_sub<-ddat[abs(ddat$Nindex- NNindex[nn])< .Machine$double.eps^0.5,]
       fitGX<-lm(    dat_sub[,3]~  dat_sub[,2]  )  ; bx<-as.numeric( summary(fitGX)$coef[-1,1]  ); bxse<-as.numeric(  summary(fitGX)$coef[-1,2])
       fitGY<-lm(    dat_sub[,4]~  dat_sub[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
       Bx<-c(Bx  , bx   ) ;  Bxse<-c(Bxse,  bxse  ) ; By<- c(  By , by ) ; Byse<-c(  Byse, byse )
-      Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(rdat)   )  #for ts1
+      Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(ddat)   )  #for ts1
       MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
       MRest[nn]<-MRres@Estimate
     }
@@ -80,17 +105,24 @@ BootstrapTreeFitting<-function(seed=1,
   ###----------------------------------------------------------------------------------------
   RES<-list()
 
+  ###RESULT 0: NNindex and MRest
+  RES$end_node_information<-rbind(NNindex,MRest)
+  ##注意：NNindex和MRest构成了重要的tree end-node information 即使MRest可能是由estdat估计出来的
+
   ###RESULT 1: OOB and testing set predicts
   #OOB individual predicted data
   theMRest<- MRest[match(  as.character(GetNindex(  OOBdat[,5:( JJ+4 ) ] ,rdat,S=S ))  ,  as.character(NNindex)    )  ] #as.character  很重要的操作！ 防止数值误骗
-  #注意：NNindex和MRest构成了重要的tree end-node information 即使MRest可能是由estdat估计出来的
+
   vect<-rep(0,NNN) #NNN 为odat size (无论是否用honest style，这么做都是没问题的)
   vect[  (Odat$I)%in%(OOBdat$I ) ]<-theMRest
   RES$OOB_predict<-vect
 
-  #Validation individual predicted predicted values
+  #testing set individual predicted predicted values
   #(如果没有testing set，那么就把v_predict设空)
-  if(!exists('vdat')){ RES$v_predict<-NA  }else{
+  #Vdat=vdat; vdat来自于当前环境(不一定是全局环境)
+  if(is.na(Vdat)){  #exists('vdat')
+    RES$v_predict<-NA
+    }else{
     theMRest<- MRest[match(  as.character(GetNindex(  Vdat[,5:( JJ+4 ) ] ,rdat,S=S ))  ,  as.character(NNindex)    )  ]
     RES$v_predict<-theMRest
   }
@@ -127,7 +159,7 @@ BootstrapTreeFitting<-function(seed=1,
   ##ts2 -> Q statistic:
   Sr<-mr_ivw(mr_input(Bx, Bxse , By, Byse))#先算effect via naive IVW under null (no effect difference)
   delta<-Sr@Estimate #一维的; 已验证！就是y_<-(By/Byse) ;  x_<-1/Byse; lm( y_ ~-1+x_)的结果
-  #Cochran's Q statistic
+  #Cochran's Q statistic (more naive version - as we ignore the correlation of the GX estimate and GY estimate)
   ssigma_square <- Byse^2 + delta^2*Bxse^2
   ts2<-sum( ( By - delta*Bx     )^2 /ssigma_square      )#critical value:  qchisq(0.95, NC-1)==3.841459
   RES$ts1<-ts1
@@ -136,32 +168,37 @@ BootstrapTreeFitting<-function(seed=1,
   return( RES )
 }
 
-#RES list:  $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2
+#RES list:  $end_node_information $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2
+#$OOB_predict: index顺序和odat一致
+#$v_predict: index顺序和vdat一致
+
+#$vi1 和 $vi2 是按照1：JJ即covariate的顺序
 
 
 
 ###examples:
 
 set.seed(60)
-res<-getDat() #simulated data
+res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 
 #When running RFQT with mutiple Q trees/bootstrap - use parallel computation
-n_cores_used<-detectCores()-1
-Nb<-100 #how many trees in the forest?
-cl<-makeCluster(n_cores_used)#规定用多少并行clusters/线程
+Nb<-5 #how many trees in the forest? e.g. 5 trees
+cl<-makeCluster(detectCores()-1)#规定用多少并行clusters/线程
 clusterEvalQ(cl=cl , expr=library(dplyr))  #给各个cluster中的运行一些表达式expression (例如导入一些包；做一些基础操作)
 clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
 clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat',
                                     'GetTree', 'GetNindex', 'GetIndex' )  )#or any other arguments
 RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  ) #本脚本里parSapply的结果常用RES表示
 stopCluster(cl)
+dim(RES)#7 Nb
 
 ##If you wish to use your own parameters rather than the default parameters, try:
 #general exmaple
 user_BootstrapTreeFitting<-function(seed){
   RES<-BootstrapTreeFitting(seed,
+                            honest=my.honest,
                             S=my.S,
                             JJ=my.JJ,   #or any partial of the arguments
                             rate=my.rate,
@@ -179,9 +216,8 @@ user_BootstrapTreeFitting<-function(seed){
 }
 
 ###parallel computation  -> RFQT
-n_cores_used<-detectCores()-1
-Nb<-100 #how many trees in the forest?
-cl<-makeCluster(n_cores_used)#规定用多少并行clusters/线程
+Nb<-5 #how many trees in the forest?
+cl<-makeCluster(detectCores()-1)#规定用多少并行clusters/线程
 clusterEvalQ(cl=cl , expr=library(dplyr))  #给各个cluster中的运行一些表达式expression (例如导入一些包；做一些基础操作)
 clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
 clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat',
