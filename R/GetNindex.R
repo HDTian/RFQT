@@ -20,14 +20,23 @@ GetNindex<-function(M,  #variable information matrix; the M colnumber and order 
     for(k in 1:length(Ls)  ){
       rdat_sub<-rdat[ round(  rdat$Nindex,s-1 )  == Ls[k],   ]
       sstring<-strsplit(    levels(factor(     rdat_sub[ ,ncol(rdat  )-S+s ] ) )  , '_' )#splited string
-      if(  length(sstring  )==0 ){
+      if(  length(sstring  )==0 ){#即，此时是NA，即没有发生split
         index_added<-0
       }else{
         J_<-as.numeric( (sstring[[1]])[1] )  #此时关注的J_ th M
-        cuttingvalue<-(as.numeric( (sstring[[2]])[3] )+as.numeric( (sstring[[1]])[3] ))/2
+        ###cuttingvalue (采用一个值作为decision rule的决策)-------------------------
+        #先算split style对应的比例
+        split_style_used<-as.numeric( (sstring[[2]])[4] )
+        weight1<-sum(c(1,1,1,2,2,3,3,4,4,4)%in%(1:split_style_used) ) #for lower/left node
+        weight2<-10-sum(c(1,1,1,2,2,3,3,4,4,4)%in%(1:split_style_used) ) #for upper/right node
+        #split style 1: 3 7
+        #split style 2: 5 5
+        #split style 3: 7 3
+        cuttingvalue<-( as.numeric( (sstring[[1]])[3] )*weight1+as.numeric( (sstring[[2]])[3] )*weight2 )/(weight1+weigth2)
+        #----------------------------------------------------------------------------
         M_sub<-M[ round( theNindex,s-1  ) == Ls[k] ,]  #只考虑满足这一类的sub matrix
         #vector赋值(赋vector Nindex)
-        index_added<-((M_sub[,J_]>cuttingvalue)+1)*0.1^s #当然是个vector
+        index_added<-((M_sub[,J_]>cuttingvalue)+1)*0.1^s #通过单值cuttingvalue判断后续走向 #结果当然是个vector
       }
       theNindex[ round( theNindex,s-1  ) == Ls[k]     ]<-Ls[k]+index_added
     }

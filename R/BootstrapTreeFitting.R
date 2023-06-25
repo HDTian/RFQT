@@ -13,6 +13,7 @@
 BootstrapTreeFitting<-function(seed=1,
                                Odat=odat,  #inputed training data
                                Vdat=vdat,  #inputed testing data
+                               honest=TRUE, #use honiest estimation or not?
                                S=5,  #maximal depth
                                rate=0.4, # the proportion of candidate variables Ms considered
                                Qthreshold=3.0, ##the threshold for Q heterogneity assessment

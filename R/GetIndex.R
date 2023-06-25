@@ -58,6 +58,9 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
     ###IV estimates---
     #RES<-c();Means<-c()
     ##3种dochotomising scenarios: c(1,1,1,2,2,3,3,4,4,4)
+    #split style 1: 111   2222222
+    #split style 2: 11111   22222
+    #split style 3: 1111111   222
     QQs<-c() #final length of QQs: 3
     Size<-c() #store the minial node size for each split
     for(dd in 1:3){
