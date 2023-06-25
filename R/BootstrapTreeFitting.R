@@ -15,7 +15,8 @@ BootstrapTreeFitting<-function(seed=1,
                                Vdat=vdat,  #inputted testing data  #Vdat can be empty or nonexistent, not defined
                                honest=TRUE, #use honest estimation or not?
                                S=5,  #maximal depth
-                               rate=0.4, # the proportion of candidate variables Ms considered
+                               rate=0.4, # the proportion of candidate variables Ms considered #if SingleM=TRUE, rate will be ignored
+                               SingleM=FALSE, #whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
                                Qthreshold=3.84, ##the threshold for Q heterogneity assessment
                                method='DR',#stratification method used
                                SoP=10, ##size of pre-stratum #only make sense to DR stratification
@@ -53,9 +54,25 @@ BootstrapTreeFitting<-function(seed=1,
 
 
   ###single tree fitting一次---------------------------------------------------------------
+  #如果使用single stratification；需要先依据dat判断出one single best candidate M,然后使用SpecificM
+  if(SingleM){
+    GetIndex_res<-GetIndex(dat,
+                         JJ=JJ, #JJ has been decided in the beginning of the BootstrapTreeFitting function
+                         rate=1, #must be  1
+                         SpecificM=NA, #must be NA #vector: user specific M index
+                         method=method,#stratification method used
+                         SoP=SoP,#size of pre-stratum  #SoP=10: better for operation: (1,1,1,2,2,3,3,4,4,4)
+                         howGX=howGX, #how to calculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                         const=const)
+    SpecificM_used<-GetIndex_res[1]
+  }else{
+    SpecificM_used<-NA
+    }
+
   rdat<-GetTree( dat,  #把dat作为GetTree的输入  #dat可以为bdat或者的treedat或者直接odat
                  S=S,
                  rate=rate,
+                 SpecificM=SpecificM_used,#一旦SpecificM被启用，那么rate会被忽视，不用担心默认定义了rate=0.4
                  Qthreshold=Qthreshold,
                  method=method,
                  SoP=SoP,
@@ -120,7 +137,7 @@ BootstrapTreeFitting<-function(seed=1,
   #testing set individual predicted predicted values
   #(如果没有testing set，那么就把v_predict设空)
   #Vdat=vdat; vdat来自于当前环境(不一定是全局环境)
-  if(is.na(Vdat)){  #exists('vdat')
+  if(as.matrix(is.na(Vdat))[1,1]){  #exists('vdat')
     RES$v_predict<-NA
     }else{
     theMRest<- MRest[match(  as.character(GetNindex(  Vdat[,5:( JJ+4 ) ] ,rdat,S=S ))  ,  as.character(NNindex)    )  ]

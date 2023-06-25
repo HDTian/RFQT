@@ -6,6 +6,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
                   S=5, #the largest depth #only makes sense for GetTree
                   Qthreshold=3.84,#the threshold for Q heterogneity assessment #only makes sense for GetTree
                   rate=1,# the proportion of candidate variables Ms considered
+                  SpecificM=NA, #vector: user specific M index
                   method='DR',
                   SoP=10, #size of pre-stratum #only make sense to DR stratification
                   howGX='SpecificGX',#'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
@@ -37,6 +38,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
         GIres<-GetIndex(dat_current,
                         JJ=JJ,
                         rate=rate,
+                        SpecificM=SpecificM,
                         method=method,
                         SoP=SoP,
                         howGX=howGX,

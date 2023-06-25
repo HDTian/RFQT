@@ -4,7 +4,8 @@
 
 GetIndex<-function(dat_current,#dat_current: current data #must be data.frame with first four columns: $I $Z $X $Y
                    JJ,#the number of total candidate variables
-                   rate=1,# rate: the proportion of M considered
+                   rate=1,# rate: the proportion of M considered #if SpecificM is used, rate will not make a difference
+                   SpecificM=NA, #vector: user specific M index
                    method='DR',#stratification method used
                    SoP=10,#size of pre-stratum  #SoP=10: better for operation: (1,1,1,2,2,3,3,4,4,4)
                    howGX='SpecificGX', #how to caculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
@@ -15,7 +16,12 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
   if((rate>1)|(rate<=0)){ stop('PLease use a correct rate (0<= rate <1)')}
   J<-round(rate*JJ)
   if(J<1){  stop('No candidiate cvoariate to be determine, use a larger rate value')     }
-  Mcandidates<-sample(1:JJ,J)
+  if(is.na(SpecificM)){
+    Mcandidates<-sample(1:JJ,J)
+    }else{
+      if(  sum(!SpecificM%in%(1:JJ))>0  ){stop('SpecificM is not correctly indexed!')}
+      Mcandidates<-SpecificM
+  }
   #print(Mcandidates)
   QQs_allM<-c()
   Size_allM<-c()#record the mininal node size after the specific split for specific M

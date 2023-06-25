@@ -6,6 +6,7 @@ RFQTfit<-function(odat, #training set
                    S=5, #the largest depth
                    honest=TRUE, #use honest estimation or not?
                    rate=0.4,# the proportion of candidate variables Ms considered
+                   SingleM=FALSE,#whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
                    Qthreshold=3.84, ##the threshold for Q heterogneity assessment
                    method='DR',#stratification method used
                    SoP=10,##size of pre-stratum #only make sense to DR stratification
@@ -21,6 +22,7 @@ RFQTfit<-function(odat, #training set
   my.honest<-honest
   my.S<-S
   my.rate<-rate
+  my.SingleM<-SingleM
   my.Qthreshold<-Qthreshold
   my.method<-method
   my.SoP<-SoP
@@ -28,7 +30,7 @@ RFQTfit<-function(odat, #training set
   my.endsize<-endsize
   my.const<-const
   if(as.matrix(is.na(vdat))[1,1]){  vdat_information<-'NA'  }else{ vdat_information<-nrow(vdat)}
-  results<-c( JJ, nrow(odat), vdat_information , honest , method , SoP , rate, S , howGX, const, endsize, Qthreshold )
+  results<-c( JJ, nrow(odat), vdat_information , honest , method , SoP , rate, SingleM, S , howGX, const, endsize, Qthreshold )
   print('Below is the summary of the parameters used for RFQT fitting')
   names(results)<-c( 'number.of.candidates.covariate',
                      'training.data.size',
@@ -37,6 +39,7 @@ RFQTfit<-function(odat, #training set
                      'stratification.method',
                      'size.of.pre-stratum',
                      'random.proportion',
+                     'use.single.stratification',
                      'max.tree.deep' ,
                      'instrument-exposure.style',
                      'GXeffect.value',
@@ -52,10 +55,11 @@ RFQTfit<-function(odat, #training set
   clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
   user_BootstrapTreeFitting<-function(seed){
     RES<-BootstrapTreeFitting(seed,
-                              #Vdat=vdat, #一旦BootstrapTreeFitting内部找不到vdat，就会去全局环境中找
+                              Vdat=vdat, #一旦BootstrapTreeFitting内部运行时找不到vdat，就会去全局环境中找
                               honest=my.honest,
                               S=my.S,
                               rate=my.rate,
+                              SingleM=my.SingleM,
                               Qthreshold=my.Qthreshold,
                               method=my.method,
                               SoP=my.SoP,
@@ -64,8 +68,9 @@ RFQTfit<-function(odat, #training set
                               const=my.const)
     return(RES)
   }
-  clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat',
-                                      'my.honest','my.S','my.rate','my.Qthreshold','my.method','my.SoP','my.howGX','my.endsize','my.const',
+  clusterExport(  cl=cl ,  varlist=c( 'odat',#in 全局环境
+                                      'vdat',#会是默认的vdat=NA，不会是全局变量的vdat
+                                      'my.honest','my.S','my.rate','my.SingleM','my.Qthreshold','my.method','my.SoP','my.howGX','my.endsize','my.const',
                                       'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
   RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting  )
   stopCluster(cl)
@@ -99,8 +104,9 @@ RFQTfit<-function(odat, #training set
 ###example:
 set.seed(60)
 res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
+odat<-res$traning.set  #training set in 全局环境
+vdat<-res$testing.set  #testing set in 全局环境
+#or: vdat <- NA
 
 ALLRES<-RFQTfit(odat)
-
+ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
