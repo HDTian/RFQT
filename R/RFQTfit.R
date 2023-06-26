@@ -8,7 +8,7 @@ RFQTfit<-function(odat, #training set
                    rate=0.4,# the proportion of candidate variables Ms considered
                    SingleM=FALSE,#whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
                    Qthreshold=3.84, ##the threshold for Q heterogneity assessment
-                   method='DR',#stratification method used
+                   method='DR',#stratification method used: 'DR' 'Residual' others
                    SoP=10,##size of pre-stratum #only make sense to DR stratification
                    howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                    endsize=5000,#the minimal size of the node of Q-tree allowed to exist
@@ -75,28 +75,40 @@ RFQTfit<-function(odat, #training set
   RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting  )
   stopCluster(cl)
 
-  ###results
+  ###results--------------------------------------------------------------------
   ALLRES<-list()
   #RES: $end_node_information $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2
   ALLRES$RES<-RES
 
   #OOB and testing MSE
-  if( is.na(vdat) ){  ALLRES$MSE_OOB<-getMSE(RES,1)  #1 for OOB; 2 for testing
+  if( as.matrix(is.na(vdat))[1,1] ){  ALLRES$MSE_OOB<-getMSE(RES,1)  #1 for OOB; 2 for testing
   }else{
-    ALLRES$MSE_OOB<-getMSE(RES,1)
+    ALLRES$MSE_OOB<-getMSE(RES,1)  #注意，function内部的odat vdat是在全局环境中寻找的
     ALLRES$MSE_test<-getMSE(RES,2)
   }
 
   #OOB and testing set individual prediction
-  if( is.na(vdat) ){  ALLRES$Predicts_OOB<-getPredict(RES,1)  #1 for OOB; 2 for testing
+  if( as.matrix(is.na(vdat))[1,1] ){  ALLRES$Predicts_OOB<-getPredict(RES,1)  #1 for OOB; 2 for testing
   }else{
-    ALLRES$Predicts_OOB<-getPredict(RES,1)
+    ALLRES$Predicts_OOB<-getPredict(RES,1)  # #注意，function内部的odat vdat是在全局环境中寻找的
     ALLRES$Predicts_test<-getPredict(RES,2)
   }
 
   #variable importance(VI只和OOB有关系，和vdat无关)
   ALLRES$VI1<-getVI(RES,VItype=1)#vi1: label known
   ALLRES$VI2<-getVI(RES,VItype=2)#vi2: label unknown
+
+
+  #permutation test statistics ts1 and ts2
+  BN<-dim(RES)[2]
+  ts_res<-c()
+  for(i in 1:BN){
+    ts_res<-rbind(ts_res ,   c(RES[6,i]$ts1, RES[7,i]$ts2 )  )
+  }
+  TS_res<-apply( ts_res , 2 , mean  )
+  names(TS_res)<-c('ts1','ts2')
+  ALLRES$TS<-TS_res
+
 
   return(ALLRES)
 }
@@ -109,6 +121,8 @@ vdat<-res$testing.set  #testing set in 全局环境
 #or: vdat <- NA
 
 ALLRES<-RFQTfit(odat)
+
+ALLRES<-RFQTfit(odat,vdat)
 
 ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
 

@@ -6,7 +6,7 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
                    JJ,#the number of total candidate variables
                    rate=1,# rate: the proportion of M considered #if SpecificM is used, rate will not make a difference
                    SpecificM=NA, #vector: user specific M index
-                   method='DR',#stratification method used
+                   method='DR',#stratification method used : 'DR' 'Residual' others
                    SoP=10,#size of pre-stratum  #SoP=10: better for operation: (1,1,1,2,2,3,3,4,4,4)
                    howGX='SpecificGX', #how to caculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                    const=NA){

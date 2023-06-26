@@ -18,7 +18,7 @@ BootstrapTreeFitting<-function(seed=1,
                                rate=0.4, # the proportion of candidate variables Ms considered #if SingleM=TRUE, rate will be ignored
                                SingleM=FALSE, #whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
                                Qthreshold=3.84, ##the threshold for Q heterogneity assessment
-                               method='DR',#stratification method used
+                               method='DR',#stratification method used: 'DR' 'Residual' others
                                SoP=10, ##size of pre-stratum #only make sense to DR stratification
                                howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                                endsize=5000,##the minimal size of the node of Q-tree allowed to exist

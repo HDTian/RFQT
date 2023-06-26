@@ -7,7 +7,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
                   Qthreshold=3.84,#the threshold for Q heterogneity assessment #only makes sense for GetTree
                   rate=1,# the proportion of candidate variables Ms considered
                   SpecificM=NA, #vector: user specific M index
-                  method='DR',
+                  method='DR', #'DR' 'Residual' others
                   SoP=10, #size of pre-stratum #only make sense to DR stratification
                   howGX='SpecificGX',#'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                   const=NA, #only make sense when howGX='const'
