@@ -128,5 +128,5 @@ ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
 
 
 
-
-
+saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
+ALLRES_<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
