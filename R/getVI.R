@@ -26,7 +26,7 @@ getVI<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹
  return( vires )
 }
 
-
+#vi1: with label #vi2: unknown label
 
 ###example:
 #RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )

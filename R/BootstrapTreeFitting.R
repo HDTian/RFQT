@@ -93,29 +93,42 @@ BootstrapTreeFitting<-function(seed=1,
     estdat$Nindex<-GetNindex(estdat[,5:(5+JJ-1)] ,rdat )#基于刚fit好的rdat来给estdat赋Nindex
     ddat<-estdat
   }
-  ###node/stratum-specific MR estimates
+
+
+  ###node/stratum-specific MR estimates----------------------------------------------------------------
+
+  #注意，如果时ddat 为rdat本身，那么肯定不会出现empty node for any Nindex,
+  #而如果是estdat作为ddat，则根据decision rule的差异性会导致一些Nindex不存在样本，即无法估计出this Nindex-specific MR estimates
   if(howGX=='const'){
     if(is.na(const)){stop('You used a constant GX association, please tell me the constant value by const=my.const ' ) }
     bx<-const;bxse<-0
     for(nn in 1:length(NNindex)){
       dat_sub<-ddat[abs(ddat$Nindex- NNindex[nn])< .Machine$double.eps^0.5,]#focus on the Nindex-specific subgroup
-      fitGY<-lm(    dat_sub[,4]~  dat_sub[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
-      Bx<-c(Bx  , bx   ) ;  Bxse<-c(Bxse,  bxse  ) ; By<- c(  By , by ) ; Byse<-c(  Byse, byse )
-      Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(ddat)   )  #for ts1  #注意honest style不需要做变动
-      MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
-      MRest[nn]<-MRres@Estimate
+      if(nrow(dat_sub)!=0){
+        fitGY<-lm(    dat_sub[,4]~  dat_sub[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
+        Bx<-c(Bx  , bx   ) ;  Bxse<-c(Bxse,  bxse  ) ; By<- c(  By , by ) ; Byse<-c(  Byse, byse )
+        Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(ddat)   )  #for ts1  #注意honest style不需要做变动
+        MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
+        MRest[nn]<-MRres@Estimate
+      }else{
+        MRest[nn]<-NA  #如果当前Nindex没有samples (只可能对于estdata出现)，那么就先设置为NA，最后再借其他Nindex的结果
+      }
     }
   }else{
     for(nn in 1:length(NNindex)){
       dat_sub<-ddat[abs(ddat$Nindex- NNindex[nn])< .Machine$double.eps^0.5,]
-      fitGX<-lm(    dat_sub[,3]~  dat_sub[,2]  )  ; bx<-as.numeric( summary(fitGX)$coef[-1,1]  ); bxse<-as.numeric(  summary(fitGX)$coef[-1,2])
-      fitGY<-lm(    dat_sub[,4]~  dat_sub[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
-      Bx<-c(Bx  , bx   ) ;  Bxse<-c(Bxse,  bxse  ) ; By<- c(  By , by ) ; Byse<-c(  Byse, byse )
-      Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(ddat)   )  #for ts1
-      MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
-      MRest[nn]<-MRres@Estimate
+      if(nrow(dat_sub)!=0){
+        fitGX<-lm(    dat_sub[,3]~  dat_sub[,2]  )  ; bx<-as.numeric( summary(fitGX)$coef[-1,1]  ); bxse<-as.numeric(  summary(fitGX)$coef[-1,2])
+        fitGY<-lm(    dat_sub[,4]~  dat_sub[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
+        Bx<-c(Bx  , bx   ) ;  Bxse<-c(Bxse,  bxse  ) ; By<- c(  By , by ) ; Byse<-c(  Byse, byse )
+        Sizeratio<-c( Sizeratio ,nrow( dat_sub) /nrow(ddat)   )  #for ts1
+        MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
+        MRest[nn]<-MRres@Estimate
+      }else{
+        MRest[nn]<-NA  #如果当前Nindex没有samples (只可能对于estdata出现)，那么就先设置为NA，最后再借其他Nindex的结果
+      }
     }
-  }
+  }#end of N-index specific MR estimAte results -> MRest
 
 
   ###results calculation---------------------------------------------------------------------
@@ -123,6 +136,16 @@ BootstrapTreeFitting<-function(seed=1,
   RES<-list()
 
   ###RESULT 0: NNindex and MRest
+  #如果MRest存在NA，那么就得借用相邻的end node (Nindex)  #注意，NNindex是严格升序的
+  if( sum(is.na(MRest))>0  ){
+    na_position<-which( is.na(MRest) )
+    for(ppp in 1:length(na_position)  ){
+      NNindex_<-NNindex
+      NNindex_[na_position[ppp]]<-1123#give  large value
+      MRest[na_position[ppp]]<-MRest[ which.min( abs(NNindex_-NNindex[na_position[ppp]])  ) ]
+    }
+  }
+
   RES$end_node_information<-rbind(NNindex,MRest)
   ##注意：NNindex和MRest构成了重要的tree end-node information 即使MRest可能是由estdat估计出来的
 

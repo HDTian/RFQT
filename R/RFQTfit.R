@@ -109,4 +109,10 @@ vdat<-res$testing.set  #testing set in 全局环境
 #or: vdat <- NA
 
 ALLRES<-RFQTfit(odat)
+
 ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
+
+
+
+
+
