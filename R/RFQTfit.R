@@ -11,7 +11,7 @@ RFQTfit<-function(odat, #training set
                    method='DR',#stratification method used: 'DR' 'Residual' others
                    SoP=10,##size of pre-stratum #only make sense to DR stratification
                    howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
-                   endsize=5000,#the minimal size of the node of Q-tree allowed to exist
+                   endsize=1000,#the minimal size of the node of Q-tree allowed to exist
                    const=NA #the pre-given fixed GX effect #only make sense when howGX='const'
                   ){
   ###data check

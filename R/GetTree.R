@@ -11,7 +11,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
                   SoP=10, #size of pre-stratum #only make sense to DR stratification
                   howGX='SpecificGX',#'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                   const=NA, #only make sense when howGX='const'
-                  endsize=5000 #the minimal size of the node of Q-tree allowed to exist. S and endsize work in a similar way. #only makes sense for GetTree
+                  endsize=1000 #the minimal size of the node of Q-tree allowed to exist. S and endsize work in a similar way. #only makes sense for GetTree
                   ){
   #先定义一个JJ；这个JJ是给Getindex用的
   if( is.null(dat$true_STE[1]) ){JJ<-ncol( dat )-4}else{JJ<-ncol( dat )-5}#如果是sim data，就减去5，否则减去4

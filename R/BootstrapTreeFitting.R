@@ -21,7 +21,7 @@ BootstrapTreeFitting<-function(seed=1,
                                method='DR',#stratification method used: 'DR' 'Residual' others
                                SoP=10, ##size of pre-stratum #only make sense to DR stratification
                                howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
-                               endsize=5000,##the minimal size of the node of Q-tree allowed to exist
+                               endsize=1000,##the minimal size of the node of Q-tree allowed to exist
                                const=NA){ #boostrap一次odat得到OOB samples effect prediction;顺便vdat的prediction也做了
   if( is.null(Odat$true_STE[1]) ){JJ<-ncol( Odat )-4}else{JJ<-ncol( Odat )-5}
   if( JJ<1 ){ stop('No candidate covariate, or the dat is not regonized')  }
