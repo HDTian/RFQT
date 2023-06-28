@@ -35,34 +35,34 @@ for(s in c('A','B','C')){
     ###############Single Stratification (still random forest)
     ###DR
     ALLRES<-RFQTfit(odat,vdat,Nb=200,SingleM=TRUE,method='DR')
-    saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_DR_',scenario_used,'_',gamma_used,'.RData')
+    saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_DR_',scenario_used,'_',gamma_used,'.RData'))
     DR_S_MSE<-c(  DR_S_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
 
     ###R
     ALLRES<-RFQTfit(odat,vdat,Nb=200,SingleM=TRUE,method='Residual')
-    saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_R_',scenario_used,'_',gamma_used,'.RData')
+    saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_R_',scenario_used,'_',gamma_used,'.RData'))
     R_S_MSE<-c(  R_S_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
 
     ###N
     ALLRES<-RFQTfit(odat,vdat,Nb=200,SingleM=TRUE,method='N')
-    saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_N_',scenario_used,'_',gamma_used,'.RData')
+    saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_N_',scenario_used,'_',gamma_used,'.RData'))
     N_S_MSE<-c(  N_S_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
 
 
     ################RFQT
     ###DR
     ALLRES<-RFQTfit(odat,vdat,Nb=200,method='DR')
-    saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_DR_',scenario_used,'_',gamma_used,'.RData')
+    saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_DR_',scenario_used,'_',gamma_used,'.RData'))
     DR_RFQT_MSE<-c(  DR_RFQT_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
 
     ###R
     ALLRES<-RFQTfit(odat,vdat,Nb=200,method='Residual')
-    saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_R_',scenario_used,'_',gamma_used,'.RData')
+    saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_R_',scenario_used,'_',gamma_used,'.RData'))
     R_RFQT_MSE<-c(  R_RFQT_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
 
     ###N
     ALLRES<-RFQTfit(odat,vdat,Nb=200,method='N')
-    saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_N_',scenario_used,'_',gamma_used,'.RData')
+    saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_N_',scenario_used,'_',gamma_used,'.RData'))
     N_RFQT_MSE<-c(  N_RFQT_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
 
     } #end of all strength of modification for a specific scenario
@@ -94,15 +94,43 @@ vdat<-Dat$testing.set
 ALLRES<-RFQTfit(odat,vdat,Nb=500,method='DR')#Nb=500
 
 saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\result2and3.RData')
+#ALLRES<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\result2and3.RData')
+
+RES<-ALLRES$RES
+MSE1<-getMSE( RES , 1 ) ; MSE2<-getMSE( RES , 2 )  #MSE1: OOB error; MSE2: test error
+#getMSE()中odat vdat使用全局环境
+plot( 1:length(MSE1) , MSE1, type='l',xlab='Number of Q trees', ylab='MSE' )
+lines(     1:length(MSE2) , MSE2, col='blue'   )
+legend('topright', legend=c('OOB error', 'Test error'),
+       col=c("black", "blue"), lty=1, cex=1.0)
+#Figure7_left  500*450
+
+predict_matrix2<-getPredict( RES,2     )#2: test set predicts
+plot(   1:ncol( predict_matrix2   )   ,  predict_matrix2[1,],  type='l', ylim=c(0.1,1.2),
+        xlab='Number of Q trees', ylab='Predicted effect')
+lines(     1:ncol( predict_matrix2   )   ,  predict_matrix2[2,], col='blue'   )
+lines(     1:ncol( predict_matrix2   )   ,  predict_matrix2[3,], col='red'   )
+lines(     1:ncol( predict_matrix2   )   ,  predict_matrix2[4,], col='green'   )
+
+legend('topright', legend=c('Individual One', 'Individual Two', 'Individual Three', 'Individual Four'),
+       col=c("black", "blue",'red','green'), lty=1, cex=0.7)
+#Figure7_right 500*450
 
 
 
 ##Result3: (new Figure)
-#according to vdat predicted HTE (i.e. v_predict), refit HTE ~ M to visulize the reults or for future guidence
+#according to vdat predicted HTE (i.e. v_predict), refit HTE ~ M to visualize the results or for future guidance
 #ALLRES就用results2 里面的即可
 
+ALLRES<-RFQTfit(odat,vdat,Nb=50,method='DR',S=7,endsize=1000)
+RES<-ALLRES$RES
+predict_matrix2<-getPredict( RES,2     )
+dim(predict_matrix2)
+dim(vdat)
 
-
+#simple linear regression
+fit<-lm(  predict_matrix2[,ncol(predict_matrix2)]~ as.matrix(vdat[,5:24])     )
+summary(fit)
 
 
 

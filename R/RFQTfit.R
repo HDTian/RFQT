@@ -55,8 +55,9 @@ RFQTfit<-function(odat, #training set
   clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
   user_BootstrapTreeFitting<-function(seed){
     RES<-BootstrapTreeFitting(seed,
-                              Vdat=vdat, #一旦BootstrapTreeFitting内部运行时找不到vdat，就会去全局环境中找
-                              honest=my.honest,
+                              Odat=odat,#其实可以不用这一行，因为BootstrapTreeFitting的Odat是有默认值的
+                              Vdat=vdat, #vdat需要去环境中找
+                              honest=my.honest,#一旦my.honest找不到，就应该报错；和honest的默认值没有关系
                               S=my.S,
                               rate=my.rate,
                               SingleM=my.SingleM,
@@ -68,11 +69,15 @@ RFQTfit<-function(odat, #training set
                               const=my.const)
     return(RES)
   }
-  clusterExport(  cl=cl ,  varlist=c( 'odat',#in 全局环境
-                                      'vdat',#会是默认的vdat=NA，不会是全局变量的vdat
-                                      'my.honest','my.S','my.rate','my.SingleM','my.Qthreshold','my.method','my.SoP','my.howGX','my.endsize','my.const',
-                                      'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
-  RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting  )
+  #clusterExport里 varlist会去全局环境中匹配，而不是当前环境
+  #clusterExport assigns the values on the master R process of the variables named in varlist to variables of the same names in the global environment (aka ‘workspace’) of each node.
+  #The environment on the master from which variables are exported defaults to the global environment.
+  # clusterExport(  cl=cl ,  varlist=c( 'odat',#in 全局环境
+  #                                     'vdat',#会是默认的vdat=NA，不会是全局变量的vdat
+  #                                     'my.honest','my.S','my.rate','my.SingleM','my.Qthreshold','my.method','my.SoP','my.howGX','my.endsize','my.const',
+  #                                     'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
+  clusterExport(  cl=cl ,  varlist=c( 'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting'))
+  RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting )
   stopCluster(cl)
 
   ###results--------------------------------------------------------------------
@@ -130,3 +135,7 @@ ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
 
 saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
 ALLRES_<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
+
+
+
+
