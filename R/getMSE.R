@@ -95,6 +95,7 @@ getMSE<-function(RES,#RES为parSapply(   cl ,  1:100, BootstrapTreeFitting  )的
 #RES<-ALLRES$RES
 set.seed(60)
 res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+res<-getDat(label=FALSE) 
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 
@@ -112,3 +113,6 @@ dim(RES)#7 Nb
 
 getMSE(RES,indicator=1 )
 getMSE(RES,indicator=2 )
+
+
+

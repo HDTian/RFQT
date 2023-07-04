@@ -125,6 +125,8 @@ vdat<-res$testing.set  #testing set
 GetIndex(odat,JJ=20)
 #Candidate.index         Q.value       node.size
 #         3.0000        324.7219     100000.0000
+
+
 #Candidate.index                      Q.value     minimal.node.size.after.split    split.style
 #         3.0000                      382.1728    30000.0000                       1.0000
 
