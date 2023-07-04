@@ -23,49 +23,49 @@ for(s in c('A','B','C')){
     Dat<-getDat(scenario=scenario_used, SoM=gamma_used)
     odat<-Dat$traning.set  #training set in 全局环境
     vdat<-Dat$testing.set  #testing set in 全局环境
-
+    
     ##############ATE
-    odat#用training set估计
+    #odat#用training set估计
     fitGX<-lm(    odat[,3]~  odat[,2]  )  ; bx<-as.numeric( summary(fitGX)$coef[-1,1]  ); bxse<-as.numeric(  summary(fitGX)$coef[-1,2])
     fitGY<-lm(    odat[,4]~  odat[,2]  )  ; by<-as.numeric( summary(fitGY)$coef[-1,1]  ); byse<-as.numeric(  summary(fitGY)$coef[-1,2])
     MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
     ATE_MSE<-c(   ATE_MSE     ,        mean(  (vdat$true_STE - MRres@Estimate )^2 ) )
-
-
+    
+    
     ###############Single Stratification (still random forest)
     ###DR
     ALLRES<-RFQTfit(odat,vdat,Nb=200,SingleM=TRUE,method='DR')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_DR_',scenario_used,'_',gamma_used,'.RData'))
     DR_S_MSE<-c(  DR_S_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
-
+    
     ###R
     ALLRES<-RFQTfit(odat,vdat,Nb=200,SingleM=TRUE,method='Residual')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_R_',scenario_used,'_',gamma_used,'.RData'))
     R_S_MSE<-c(  R_S_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
-
+    
     ###N
     ALLRES<-RFQTfit(odat,vdat,Nb=200,SingleM=TRUE,method='N')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_N_',scenario_used,'_',gamma_used,'.RData'))
     N_S_MSE<-c(  N_S_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
-
-
+    
+    
     ################RFQT
     ###DR
     ALLRES<-RFQTfit(odat,vdat,Nb=200,method='DR')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_DR_',scenario_used,'_',gamma_used,'.RData'))
     DR_RFQT_MSE<-c(  DR_RFQT_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
-
+    
     ###R
     ALLRES<-RFQTfit(odat,vdat,Nb=200,method='Residual')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_R_',scenario_used,'_',gamma_used,'.RData'))
     R_RFQT_MSE<-c(  R_RFQT_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
-
+    
     ###N
     ALLRES<-RFQTfit(odat,vdat,Nb=200,method='N')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_N_',scenario_used,'_',gamma_used,'.RData'))
     N_RFQT_MSE<-c(  N_RFQT_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
-
-    } #end of all strength of modification for a specific scenario
+    
+  } #end of all strength of modification for a specific scenario
   #ATE
   ATE_MSE_<-rbind(ATE_MSE_,ATE_MSE)
   #single stratification
