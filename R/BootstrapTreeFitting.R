@@ -143,7 +143,7 @@ BootstrapTreeFitting<-function(seed=1,
     na_position<-which( is.na(MRest) )
     for(ppp in 1:length(na_position)  ){
       NNindex_<-NNindex
-      NNindex_[na_position[ppp]]<-1123#give  large value
+      NNindex_[na_position]<-1123#give  large value  #注意应该让所有NA的位置都赋很大的值；否则很容易出现两个NA相互借力的情况
       MRest[na_position[ppp]]<-MRest[ which.min( abs(NNindex_-NNindex[na_position[ppp]])  ) ]
     }
   }
