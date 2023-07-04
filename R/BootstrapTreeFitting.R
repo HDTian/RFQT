@@ -27,8 +27,8 @@ BootstrapTreeFitting<-function(seed=1,
   if( JJ<1 ){ stop('No candidate covariate, or the dat is not regonized')  }
   #这个JJ主要是给后面的RES$vi用的，
   #至于treefitting中的splitting variable index选择，GetTree自己会再定义(但这两个定义的JJ当然得一样)
-
-
+  
+  
   #check the IDindex in Odat is strictly increasing
   #(因为最后返回的结果OOBpredict是和odat index顺序匹配的)
   if(  sum((Odat$I[-1]-Odat$I[-length(Odat$I)])<=0)>0  ){
@@ -44,31 +44,31 @@ BootstrapTreeFitting<-function(seed=1,
   OOBdat<-Odat[  -as.numeric( levels( factor(Bindex  ) ) ), ]  #OOBdat的I是严格升序的
   #OOB error和Variable Importance的关键
   dat<-bdat
-
+  
   if(honest){ #honest estimation
     #random split (注意：必须要random split；但是由于bootstrap index是随机的且没有sort,可以直接按照bdat的I顺序来分)
     treedat<-bdat[(1:round(nrow(bdat)/2)),]#bdat的I是严格升序的
     estdat<-bdat[-(1:round(nrow(bdat)/2)),]
     dat<-treedat
   }
-
-
+  
+  
   ###single tree fitting一次---------------------------------------------------------------
   #如果使用single stratification；需要先依据dat判断出one single best candidate M,然后使用SpecificM
   if(SingleM){
     GetIndex_res<-GetIndex(dat,
-                         JJ=JJ, #JJ has been decided in the beginning of the BootstrapTreeFitting function
-                         rate=1, #must be  1
-                         SpecificM=NA, #must be NA #vector: user specific M index
-                         method=method,#stratification method used
-                         SoP=SoP,#size of pre-stratum  #SoP=10: better for operation: (1,1,1,2,2,3,3,4,4,4)
-                         howGX=howGX, #how to calculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
-                         const=const)
+                           JJ=JJ, #JJ has been decided in the beginning of the BootstrapTreeFitting function
+                           rate=1, #must be  1
+                           SpecificM=NA, #must be NA #vector: user specific M index
+                           method=method,#stratification method used
+                           SoP=SoP,#size of pre-stratum  #SoP=10: better for operation: (1,1,1,2,2,3,3,4,4,4)
+                           howGX=howGX, #how to calculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                           const=const)
     SpecificM_used<-GetIndex_res[1]
   }else{
     SpecificM_used<-NA
-    }
-
+  }
+  
   rdat<-GetTree( dat,  #把dat作为GetTree的输入  #dat可以为bdat或者的treedat或者直接odat
                  S=S,
                  rate=rate,
@@ -79,7 +79,7 @@ BootstrapTreeFitting<-function(seed=1,
                  howGX=howGX,
                  const=const,
                  endsize=endsize)  #返回rdat这个data.frame  ;  GetTree是最耗时的function
-
+  
   ###get the MR est for each Nindex based on this single tree fitting----------------------
   ddat<-rdat #ddat是用来做Node/stratum-specific MR estimates
   NNindex<-as.numeric(  levels(     factor(   rdat$Nindex  )   )   )  #所有NNindex的种类
@@ -93,10 +93,10 @@ BootstrapTreeFitting<-function(seed=1,
     estdat$Nindex<-GetNindex(estdat[,5:(5+JJ-1)] ,rdat )#基于刚fit好的rdat来给estdat赋Nindex
     ddat<-estdat
   }
-
-
+  
+  
   ###node/stratum-specific MR estimates----------------------------------------------------------------
-
+  
   #注意，如果时ddat 为rdat本身，那么肯定不会出现empty node for any Nindex,
   #而如果是estdat作为ddat，则根据decision rule的差异性会导致一些Nindex不存在样本，即无法估计出this Nindex-specific MR estimates
   if(howGX=='const'){
@@ -111,6 +111,7 @@ BootstrapTreeFitting<-function(seed=1,
         MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
         MRest[nn]<-MRres@Estimate
       }else{
+        Sizeratio<-c( Sizeratio ,0   )
         MRest[nn]<-NA  #如果当前Nindex没有samples (只可能对于estdata出现)，那么就先设置为NA，最后再借其他Nindex的结果
       }
     }
@@ -125,16 +126,17 @@ BootstrapTreeFitting<-function(seed=1,
         MRres<-mr_ivw(mr_input(bx, bxse, by, byse))
         MRest[nn]<-MRres@Estimate
       }else{
+        Sizeratio<-c( Sizeratio ,0   )
         MRest[nn]<-NA  #如果当前Nindex没有samples (只可能对于estdata出现)，那么就先设置为NA，最后再借其他Nindex的结果
       }
     }
   }#end of N-index specific MR estimAte results -> MRest
-
-
+  
+  
   ###results calculation---------------------------------------------------------------------
   ###----------------------------------------------------------------------------------------
   RES<-list()
-
+  
   ###RESULT 0: NNindex and MRest
   #如果MRest存在NA，那么就得借用相邻的end node (Nindex)  #注意，NNindex是严格升序的
   if( sum(is.na(MRest))>0  ){
@@ -145,29 +147,29 @@ BootstrapTreeFitting<-function(seed=1,
       MRest[na_position[ppp]]<-MRest[ which.min( abs(NNindex_-NNindex[na_position[ppp]])  ) ]
     }
   }
-
-  RES$end_node_information<-rbind(NNindex,MRest)
+  
+  RES$end_node_information<-rbind(NNindex,MRest,Sizeratio)
   ##注意：NNindex和MRest构成了重要的tree end-node information 即使MRest可能是由estdat估计出来的
-
+  
   ###RESULT 1: OOB and testing set predicts
   #OOB individual predicted data
   theMRest<- MRest[match(  as.character(GetNindex(  OOBdat[,5:( JJ+4 ) ] ,rdat,S=S ))  ,  as.character(NNindex)    )  ] #as.character  很重要的操作！ 防止数值误骗
-
+  
   vect<-rep(0,NNN) #NNN 为odat size (无论是否用honest style，这么做都是没问题的)
   vect[  (Odat$I)%in%(OOBdat$I ) ]<-theMRest
   RES$OOB_predict<-vect
-
+  
   #testing set individual predicted predicted values
   #(如果没有testing set，那么就把v_predict设空)
   #Vdat=vdat; vdat来自于当前环境(不一定是全局环境)
   if(as.matrix(is.na(Vdat))[1,1]){  #exists('vdat')
     RES$v_predict<-NA
-    }else{
+  }else{
     theMRest<- MRest[match(  as.character(GetNindex(  Vdat[,5:( JJ+4 ) ] ,rdat,S=S ))  ,  as.character(NNindex)    )  ]
     RES$v_predict<-theMRest
   }
-
-
+  
+  
   ###RESULT 2: Variable Importance (VI) - for simulation data with label known (vi1) or unpermuted estimates as the true treatment effect (vi2)
   #(VIs 只在training set 和OOB set里进行，和testing set没关系)
   vi1<-'N/A'
@@ -192,10 +194,10 @@ BootstrapTreeFitting<-function(seed=1,
   #本次Q-tree内的各个candidate variable的VI measurement
   RES$vi1<-vi1   #如果是用real data,那么vi1就是c() #vi1没法用在real data中
   RES$vi2<-vi2
-
+  
   ###RESULT 3: Permutation test statistics ts1 and ts2
   #sum(Sizeratio) == 1 #checked!
-  ts1<-  sum(Sizeratio*(MRest-  sum(  Sizeratio*MRest  ))^2)
+  ts1<-  sum(Sizeratio*(MRest-  sum(  Sizeratio*MRest  ))^2)#MRest不可能存在NA
   ##ts2 -> Q statistic:
   Sr<-mr_ivw(mr_input(Bx, Bxse , By, Byse))#先算effect via naive IVW under null (no effect difference)
   delta<-Sr@Estimate #一维的; 已验证！就是y_<-(By/Byse) ;  x_<-1/Byse; lm( y_ ~-1+x_)的结果
@@ -204,7 +206,7 @@ BootstrapTreeFitting<-function(seed=1,
   ts2<-sum( ( By - delta*Bx     )^2 /ssigma_square      )#critical value:  qchisq(0.95, NC-1)==3.841459
   RES$ts1<-ts1
   RES$ts2<-ts2
-
+  
   return( RES )
 }
 
