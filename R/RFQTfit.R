@@ -2,22 +2,22 @@
 
 RFQTfit<-function(odat, #training set
                   vdat=NA, #validation set (can be empty)
-                   Nb=5,  # the number of Q-trees
-                   S=5, #the largest depth
-                   honest=TRUE, #use honest estimation or not?
-                   rate=0.4,# the proportion of candidate variables Ms considered
-                   SingleM=FALSE,#whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
-                   Qthreshold=3.84, ##the threshold for Q heterogneity assessment
-                   method='DR',#stratification method used: 'DR' 'Residual' others
-                   SoP=10,##size of pre-stratum #only make sense to DR stratification
-                   howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
-                   endsize=1000,#the minimal size of the node of Q-tree allowed to exist
-                   const=NA #the pre-given fixed GX effect #only make sense when howGX='const'
-                  ){
+                  Nb=5,  # the number of Q-trees
+                  S=5, #the largest depth
+                  honest=TRUE, #use honest estimation or not?
+                  rate=0.4,# the proportion of candidate variables Ms considered
+                  SingleM=FALSE,#whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
+                  Qthreshold=3.84, ##the threshold for Q heterogneity assessment
+                  method='DR',#stratification method used: 'DR' 'Residual' others
+                  SoP=10,##size of pre-stratum #only make sense to DR stratification
+                  howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                  endsize=1000,#the minimal size of the node of Q-tree allowed to exist
+                  const=NA #the pre-given fixed GX effect #only make sense when howGX='const'
+){
   ###data check
   if( is.null(odat$true_STE[1]) ){JJ<-ncol( odat )-4}else{JJ<-ncol( odat )-5}
   if( JJ<1 ){ stop('No candidate covariate, or the data is not regonized')  }
-
+  
   ###parameter define
   my.honest<-honest
   my.S<-S
@@ -46,7 +46,7 @@ RFQTfit<-function(odat, #training set
                      'min.end.node.size',
                      'Q.value.threshold')
   print(results)
-
+  
   #RFQT fitting
   n_cores_used<-detectCores()-1
   print(paste0('The number of cores used: ',n_cores_used))
@@ -79,31 +79,31 @@ RFQTfit<-function(odat, #training set
   clusterExport(  cl=cl ,  varlist=c( 'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting'))
   RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting )
   stopCluster(cl)
-
+  
   ###results--------------------------------------------------------------------
   ALLRES<-list()
   #RES: $end_node_information $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2
   ALLRES$RES<-RES
-
+  
   #OOB and testing MSE
   if( as.matrix(is.na(vdat))[1,1] ){  ALLRES$MSE_OOB<-getMSE(RES,1)  #1 for OOB; 2 for testing
   }else{
     ALLRES$MSE_OOB<-getMSE(RES,1)  #注意，function内部的odat vdat是在全局环境中寻找的
     ALLRES$MSE_test<-getMSE(RES,2)
   }
-
+  
   #OOB and testing set individual prediction
   if( as.matrix(is.na(vdat))[1,1] ){  ALLRES$Predicts_OOB<-getPredict(RES,1)  #1 for OOB; 2 for testing
   }else{
     ALLRES$Predicts_OOB<-getPredict(RES,1)  # #注意，function内部的odat vdat是在全局环境中寻找的
     ALLRES$Predicts_test<-getPredict(RES,2)
   }
-
+  
   #variable importance(VI只和OOB有关系，和vdat无关)
   ALLRES$VI1<-getVI(RES,VItype=1)#vi1: label known
   ALLRES$VI2<-getVI(RES,VItype=2)#vi2: label unknown
-
-
+  
+  
   #permutation test statistics ts1 and ts2
   BN<-dim(RES)[2]
   ts_res<-c()
@@ -113,8 +113,8 @@ RFQTfit<-function(odat, #training set
   TS_res<-apply( ts_res , 2 , mean  )
   names(TS_res)<-c('ts1','ts2')
   ALLRES$TS<-TS_res
-
-
+  
+  
   return(ALLRES)
 }
 
@@ -136,6 +136,6 @@ ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
 saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
 ALLRES_<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
 
-
+#Error in get(name, envir = envir) : object 'my.honest' not found 因为全局环境中没有my.honest这个量
 
 
