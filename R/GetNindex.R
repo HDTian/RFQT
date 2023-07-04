@@ -7,12 +7,12 @@
 GetNindex<-function(M,  #variable information matrix; the M colnumber and order should be same as the training data
                     rdat,#the result from GetTree() #it contains the tree information
                     S=NA #the same depth of the fitted tree
-                    ){
+){
   #先根据rdat把S算出来
   if(is.na(S)){ #如果不申明S，那么就会自动判断；如果不放心，就自己设置对的S
     namestring<-names( rdat )[ncol(rdat)]
     S<-as.numeric(  (strsplit(   namestring  , '_' )[[1]])[2]  )
-    }
+  }
   #基本思路是把这个M也跟着tree pass down一下；每次对M进行Nindex的迭代/更新
   theNindex<-rep(0, nrow(M))  #此时是个vector
   for(s in 1:S){  #S: total split times; i.e. the same depth of the fitted tree
