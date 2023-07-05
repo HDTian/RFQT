@@ -4,7 +4,7 @@ RFQTfit<-function(odat, #training set
                   vdat=NA, #validation set (can be empty)
                   Nb=5,  # the number of Q-trees
                   S=5, #the largest depth
-                  honest=TRUE, #use honest estimation or not?
+                  honest=FALSE, #use honest estimation or not?
                   rate=0.4,# the proportion of candidate variables Ms considered
                   SingleM=FALSE,#whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
                   Qthreshold=3.84, ##the threshold for Q heterogneity assessment

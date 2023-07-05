@@ -13,7 +13,7 @@
 BootstrapTreeFitting<-function(seed=1,
                                Odat=odat,  #inputted training data
                                Vdat=vdat,  #inputted testing data  #Vdat can be empty or nonexistent, not defined
-                               honest=TRUE, #use honest estimation or not?
+                               honest=FALSE, #use honest estimation or not?
                                S=5,  #maximal depth
                                rate=0.4, # the proportion of candidate variables Ms considered #if SingleM=TRUE, rate will be ignored
                                SingleM=FALSE, #whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
