@@ -19,10 +19,17 @@ getVI<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹
   }else{
     for(i in 1:BN){   VI<-rbind( VI ,  RES[4,i]$vi1 )  }
   }
+  
+  if(  RES[4,1]$vi1 =="N/A"  ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel£¬Ã»ÓĞlabelµÄ»°¾ÍÖ±½Ó»»³ÉNA²»ÓÃ¡¯N/A¡®ÁË£¬²»È»»áÓĞwarning
+    VI<-matrix( rep(NA,BN), BN,1  )   }
 
   VI_means<-apply(VI,2,mean)
   vires<-VI_means*(VI_means >0  )#ÕâÀïÈÃ¸ºÊıÖµÈ«²¿±ä³É0
-  names(vires)<-paste0( 'Covariate', 1:length(vires)   )
+  if( RES[4,1]$vi1 =="N/A" ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel
+    names(vires)<-'No.label.for.VI1'
+  }else{
+    names(vires)<-paste0( 'Covariate', 1:length(vires)   )
+    }
  return( vires )
 }
 
