@@ -23,6 +23,7 @@ BootstrapTreeFitting<-function(seed=1,
                                howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                                endsize=1000,##the minimal size of the node of Q-tree allowed to exist
                                const=NA){ #boostrap一次odat得到OOB samples effect prediction;顺便vdat的prediction也做了
+  print(paste0( 'seed:',seed )  )
   if( is.null(Odat$true_STE[1]) ){JJ<-ncol( Odat )-4}else{JJ<-ncol( Odat )-5}
   if( JJ<1 ){ stop('No candidate covariate, or the dat is not regonized')  }
   #这个JJ主要是给后面的RES$vi用的，
@@ -251,6 +252,8 @@ user_BootstrapTreeFitting<-function(seed){
                             endsize=my.endsize)
   return(RES)
 }
+
+
 #specific exmaple
 user_BootstrapTreeFitting<-function(seed){
   RES<-BootstrapTreeFitting(seed,SoP=20)

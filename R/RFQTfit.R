@@ -12,7 +12,8 @@ RFQTfit<-function(odat, #training set
                   SoP=10,##size of pre-stratum #only make sense to DR stratification
                   howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                   endsize=1000,#the minimal size of the node of Q-tree allowed to exist
-                  const=NA #the pre-given fixed GX effect #only make sense when howGX='const'
+                  const=NA, #the pre-given fixed GX effect #only make sense when howGX='const'
+                  trackfile=NA #if to track the seed results? if TRUE, need to specify the redictored path (default is no path file to track; i.e. NA)
 ){
   ###data check
   if( is.null(odat$true_STE[1]) ){JJ<-ncol( odat )-4}else{JJ<-ncol( odat )-5}
@@ -50,9 +51,15 @@ RFQTfit<-function(odat, #training set
   #RFQT fitting
   n_cores_used<-detectCores()-1
   print(paste0('The number of cores used: ',n_cores_used))
-  cl<-makeCluster(n_cores_used)
+  
+  if( is.na(trackfile)  ){
+    cl<-makeCluster(n_cores_used) 
+  }else{    cl<-makeCluster(n_cores_used,outfile=trackfile)      }
+
+  
   clusterEvalQ(cl=cl , expr=library(dplyr))
   clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
+  
   user_BootstrapTreeFitting<-function(seed){
     RES<-BootstrapTreeFitting(seed,
                               Odat=odat,#其实可以不用这一行，因为BootstrapTreeFitting的Odat是有默认值的
