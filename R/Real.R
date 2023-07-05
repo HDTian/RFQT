@@ -2,7 +2,11 @@
 
 
 #Real application code
-dim(Dat)#Dat: the real data with the same form as the simulated data (i.e ID+Z+X+Y+M) no HTE labels
+
+Dat<-read.csv(  paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\Dat.csv'),header=T,na.strings ="?"  )
+
+#Dat: the real data with the same form as the simulated data (i.e ID+Z+X+Y+M) no HTE labels
+dim(Dat) #142186     32
 
 apply(Dat, 2, is.numeric)
 apply(Dat, 2, is.character)
@@ -23,14 +27,20 @@ odat<-Dat[1:NNN,]   #original (training) dat
 
 
 #RFQT fitting
-ALLRES_real<-RFQTfit(odat,vdat,Nb=200,method='DR')
-saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
-ALLRES_<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
+ALLRES_real<-RFQTfit(odat,vdat,Nb=200,method='DR')\
+
+#saveRDS(ALLRES_real,file='D:\\files\\R new\\Precison_Medicine\\real_data\\ALLRES_real.RData')
+#ALLRES_real<-readRDS('D:\\files\\R new\\Precison_Medicine\\real_data\\ALLRES_real.RData')
 
 
 ###result1: (Figure 4)
 #histogram plot of the testing set predicts using (DR Nb=200)
+summary(  ALLRES_real$Predicts_test[,200]  )
+#     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+#-0.717172 -0.028483 -0.019300 -0.020037 -0.009268  0.531695 
 
+
+hist( ALLRES_real$Predicts_test[,200]  , n=500, xlim=c(-0.1,0.05) , main='', xlab='Predicted effect')
 
 
 ###results2: (Figure S2)

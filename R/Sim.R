@@ -84,7 +84,7 @@ for(s in c('A','B','C')){
 
 
 ###result2: (Figure 7)
-#MSE and individual predicted effect curve changing along the number ofQ trees
+#MSE and individual predicted effect curve changing along the number of Q trees
 
 set.seed(1123)
 Dat<-getDat(scenario='A', SoM=0.5) #simulated data  #the default setting: scenario='A' and SoM=0.5
@@ -134,7 +134,7 @@ summary(fit)
 
 
 
-
+#Decision tree
 
 
 
