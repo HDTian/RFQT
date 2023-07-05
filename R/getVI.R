@@ -15,22 +15,36 @@ getVI<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹
   #100Îªboostrapped´ÎÊı/¼´RFQTµÄsize/¼´BN)
   VI<-c()
   if(VItype==2){   #single Q-tree ÏÂµÄ¸÷¸öcandidate variableµÄVI measurement
+    
     for(i in 1:BN){   VI<-rbind( VI ,  RES[5,i]$vi2 )  }
-  }else{
-    for(i in 1:BN){   VI<-rbind( VI ,  RES[4,i]$vi1 )  }
+    
+    
+    VI_means<-apply(VI,2,mean)
+    vires<-VI_means*(VI_means >0  )#ÕâÀïÈÃ¸ºÊıÖµÈ«²¿±ä³É0
+    
+    names(vires)<-paste0( 'Covariate', 1:length(vires)   )  #VItype==2Ê±£¬²»¿ÉÄÜ³öÏÖ¡¯N/A¡®µÄÇé¿ö
   }
   
-  if(  RES[4,1]$vi1 =="N/A"  ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel£¬Ã»ÓĞlabelµÄ»°¾ÍÖ±½Ó»»³ÉNA²»ÓÃ¡¯N/A¡®ÁË£¬²»È»»áÓĞwarning
-    VI<-matrix( rep(NA,BN), BN,1  )   }
-
-  VI_means<-apply(VI,2,mean)
-  vires<-VI_means*(VI_means >0  )#ÕâÀïÈÃ¸ºÊıÖµÈ«²¿±ä³É0
-  if( RES[4,1]$vi1 =="N/A" ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel
-    names(vires)<-'No.label.for.VI1'
-  }else{
-    names(vires)<-paste0( 'Covariate', 1:length(vires)   )
+  
+  
+  if(VItype==1){   #VI1  with true STE labels
+    
+    for(i in 1:BN){   VI<-rbind( VI ,  RES[4,i]$vi1 )  }
+    
+    if(  RES[4,1]$vi1 =="N/A"  ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel£¬Ã»ÓĞlabelµÄ»°¾ÍÖ±½Ó»»³ÉNA²»ÓÃ¡¯N/A¡®ÁË£¬²»È»»áÓĞwarning
+      VI<-matrix( rep(NA,BN), BN,1  )   }
+    
+    VI_means<-apply(VI,2,mean)
+    vires<-VI_means*(VI_means >0  )#ÕâÀïÈÃ¸ºÊıÖµÈ«²¿±ä³É0  #Èç¹ûÊÇNAÒ²²»Òª½ô£¬²»»á±¨´í
+    
+    if( RES[4,1]$vi1 =="N/A" ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel
+      names(vires)<-'No.label.for.VI1'
+    }else{
+      names(vires)<-paste0( 'Covariate', 1:length(vires)   )
     }
- return( vires )
+  }
+  
+  return( vires )
 }
 
 #vi1: with label #vi2: unknown label
