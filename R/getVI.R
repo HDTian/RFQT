@@ -31,13 +31,13 @@ getVI<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹
     
     for(i in 1:BN){   VI<-rbind( VI ,  RES[4,i]$vi1 )  }
     
-    if(  RES[4,1]$vi1 =="N/A"  ){  #¼´£¬ÅÐ¶ÏÒ»ÏÂÊÇ·ñÓÐlabel£¬Ã»ÓÐlabelµÄ»°¾ÍÖ±½Ó»»³ÉNA²»ÓÃ¡¯N/A¡®ÁË£¬²»È»»áÓÐwarning
+    if(  (RES[4,1]$vi1)[1] =="N/A"  ){  #¼´£¬ÅÐ¶ÏÒ»ÏÂÊÇ·ñÓÐlabel£¬Ã»ÓÐlabelµÄ»°¾ÍÖ±½Ó»»³ÉNA²»ÓÃ¡¯N/A¡®ÁË£¬²»È»»áÓÐwarning
       VI<-matrix( rep(NA,BN), BN,1  )   }
     
     VI_means<-apply(VI,2,mean)
     vires<-VI_means*(VI_means >0  )#ÕâÀïÈÃ¸ºÊýÖµÈ«²¿±ä³É0  #Èç¹ûÊÇNAÒ²²»Òª½ô£¬²»»á±¨´í
     
-    if( RES[4,1]$vi1 =="N/A" ){  #¼´£¬ÅÐ¶ÏÒ»ÏÂÊÇ·ñÓÐlabel
+    if( (RES[4,1]$vi1)[1] =="N/A" ){  #¼´£¬ÅÐ¶ÏÒ»ÏÂÊÇ·ñÓÐlabel
       names(vires)<-'No.label.for.VI1'
     }else{
       names(vires)<-paste0( 'Covariate', 1:length(vires)   )
