@@ -36,6 +36,7 @@ for(s in c('A','B','C')){
     ###DR
     ALLRES<-RFQTfit(odat,vdat,Nb=200,SingleM=TRUE,method='DR')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_DR_',scenario_used,'_',gamma_used,'.RData'))
+    #ALLRES<-readRDS(file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\S_DR_',scenario_used,'_',gamma_used,'.RData'))
     DR_S_MSE<-c(  DR_S_MSE , ALLRES$MSE_test[length(ALLRES$MSE_test)] )
     
     ###R
@@ -135,7 +136,9 @@ summary(fit)
 
 
 #Decision tree
-
+library(rpart)
+tree <- rpart(medv ~., data = train)
+rpart.plot(tree)
 
 
 
