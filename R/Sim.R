@@ -94,8 +94,8 @@ vdat<-Dat$testing.set
 
 ALLRES<-RFQTfit(odat,vdat,Nb=500,method='DR')#Nb=500
 
-saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\result2and3.RData')
-#ALLRES<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\result2and3.RData')
+saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\sim500.RData')
+#ALLRES<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\sim500.RData')
 
 RES<-ALLRES$RES
 MSE1<-getMSE( RES , 1 ) ; MSE2<-getMSE( RES , 2 )  #MSE1: OOB error; MSE2: test error

@@ -60,12 +60,12 @@ ggsave(paste0('Fig4.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for t
 
 ###results2: (Figure S2)
 #Variable importance plot
-VIindex<-order(ALLRES_real$VI2)
+VIindex<-order(ALLRES_real$VI2)#得出一组position index用以表示最小到最大unit的各自的位置 
 
-ggdata_VI<-data.frame(candidate=factor(names(Dat)[VIindex+4],levels =(names(Dat)[VIindex+4])[JJ:1] ),  #逆向排序
+ggdata_VI<-data.frame(candidate=factor(names(Dat)[VIindex+4],levels =(names(Dat)[VIindex+4])[length(VIindex):1] ),  #逆向排序
                       VI=( ALLRES_real$VI2 )[VIindex]   )  
 p<-ggplot(ggdata_VI,aes(x=candidate,y=VI))+geom_col( )+
-  xlab('Candidate')+ylab('Variable Importance')+#labs(title=c('Doubly-ranked method', 'Residual method' , 'Naive method'   )[RESindex] )+
+  xlab('Candidate covariate')+ylab('Variable Importance')+#labs(title=c('Doubly-ranked method', 'Residual method' , 'Naive method'   )[RESindex] )+
   theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+
   coord_flip()
 p
@@ -78,7 +78,30 @@ ggsave(paste0('Fig_S2.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for
 ###result3: (Figure 5)
 #important variable -> marginal stratum analysis using pre-determined (tenth) quantile points
 #one can use DRMR package
-#Q statistic use average; point and CIS use Rubin's Rule (RR)
+#Q statistic use average; point and CIS use Rubin's Rule (RR)?
+
+VInames<-(names(Dat)[VIindex+4])[length(VIindex):1]
+VInames[1:6]  #"dbp"    "hip"    "monos"  "wt"     "ages"   "vitcap"
+
+dim(Dat)
+names(Dat)
+#devtools::install_github("HDTian/DRMR")
+library(DRMR)
+
+for(i in 1:6){
+  Mname<-VInames[i]  #M: marginal specific covariate name
+  dat<-Dat[,     c(   2 ,3,4, match(Mname,names(Dat)   ) ) ]
+  names(dat)<-c(  'Z', 'X', 'Y', 'M' ) #for DRMR
+  apply(dat, 2, is.numeric) #TRUE TRUE TRUE TRUE
+  
+  #stratification via DRMR
+  rdat<-Stratify(dat,onExposure = FALSE)#augmented dataset
+  SRES<-getSummaryInf(rdat) #Stratification RESults
+  
+  #visualization
+}
+dat<-DAT
+
 
 
 
