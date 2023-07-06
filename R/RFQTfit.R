@@ -13,7 +13,7 @@ RFQTfit<-function(odat, #training set
                   howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                   endsize=1000,#the minimal size of the node of Q-tree allowed to exist
                   const=NA, #the pre-given fixed GX effect #only make sense when howGX='const'
-                  trackfile=NA #if to track the seed results? if TRUE, need to specify the redictored path (default is no path file to track; i.e. NA)
+                  trackfile=NA #if to track the seed results? if TRUE, need to specify the redirector path (default is no path file to track; i.e. NA)
 ){
   ###data check
   if( is.null(odat$true_STE[1]) ){JJ<-ncol( odat )-4}else{JJ<-ncol( odat )-5}
