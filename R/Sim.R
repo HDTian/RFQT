@@ -4,8 +4,8 @@
 
 ###simulation code
 
-###result1: (Figure 3)
-#MSE results of the three X-M model Scenarios with different Strength of Modification (SoM) using RFQT and single-stratification
+###result1: (Figure 3)--------------------------------------------------------------------------------------------------------------------
+#MSE results of the three X-M model Scenarios with different Strength of Modification (SoM) using RFQT and single-stratification----------
 
 
 for(s in c('A','B','C')){
@@ -65,8 +65,8 @@ for(s in c('A','B','C')){
 
 
 
-###result2: (Figure 7)
-#MSE and individual predicted effect curve changing along the number of Q trees
+###result2: (Figure 7)--------------------------------------------------------------------------------------------------------------------------
+#MSE and individual predicted effect curve changing along the number of Q trees-----------------------------------------------------------------
 
 set.seed(1123)
 Dat<-getDat(scenario='A', SoM=0.5) #simulated data  #the default setting: scenario='A' and SoM=0.5
@@ -144,8 +144,8 @@ ggsave(paste0('Fig7_right.eps' ),   #.eps  #real以后都特指R3： BMI on fev1
 
 
 
-##Results3: (newFig1)
-#scatter plot of true HTE v.s. est HTE
+##Results3: (newFig1)-------------------------------------------------------------------------------------------------------------------
+#scatter plot of true HTE v.s. est HTE--------------------------------------------------------------------------------------------------
 plot(   ALLRES$Predicts_test[,500],vdat$true_STE  )
 abline(0,1,col='red')
 
@@ -167,8 +167,8 @@ ggsave(paste0('newFig1.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 fo
        height = 5, width = 5, units = "in",limitsize=TRUE)
 
 
-##Results4: (newFig2)
-#VI plot
+##Results4: (newFig2)-----------------------------------------------------------------------------------------------------------
+#VI plot------------------------------------------------------------------------------------------------------------------------
 names(odat)
 names(odat)[5:24]<-paste0('M',1:20)
 #left - VI1
@@ -201,8 +201,8 @@ ggsave(paste0('newFig2_right.eps' ),   #.eps  #real以后都特指R3： BMI on f
 
 
 
-##Result5: (newFig3)
-#according to vdat predicted HTE (i.e. v_predict), refit HTE ~ M to visualize the results or for future guidance
+##Result5: (newFig3)------------------------------------------------------------------------------------------------------------------
+#according to vdat predicted HTE (i.e. v_predict), refit HTE ~ M to visualize the results or for future guidance----------------------
 #ALLRES就用results2 里面的即可
 
 #ALLRES<-RFQTfit(odat,vdat,Nb=50,method='DR',S=7,endsize=1000)
@@ -264,4 +264,118 @@ ggsave(paste0('newFig3_down.eps' ),   #.eps  #real以后都特指R3： BMI on fe
        plot =p ,  #非指定 
        path=paste0('C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots'), 
        height = 5, width = 7, units = "in",limitsize=TRUE)
+
+
+
+
+
+
+
+###Result6: (newFig4)--------------------------------------------------------------------------------------------------------------------------
+#marginal stratifed MR analysis for similumation according to VI results (i.e. M1-M5)----------------------------------------------------------
+set.seed(1123)
+Dat<-getDat(scenario='A', SoM=0) #use weak mofification case
+#first five effect strength (non-random): 0.02683119 -0.09730073 -0.20634060  0.01270463  0.05128102
+
+
+wholedat<-Dat$whole.data
+odat<-Dat$traning.set  #training set in 全局环境
+vdat<-Dat$testing.set
+
+hist(     wholedat$true_STE,n=100      )
+
+ALLRES<-RFQTfit(odat,vdat,Nb=200,method='DR')#Nb=200 
+saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\simSoM0.RData')
+#ALLRES<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\simSoM0.RData')
+
+names(wholedat)[5:24]<-paste0("M",1:20)
+VIindex<-order(ALLRES$VI2)
+VInames<-(names(wholedat)[VIindex+4])[length(VIindex):1]
+VInames[1:6]  #"M3"  "M2"  "M13" "M12" "M4"  "M1" 
+
+
+
+for(i in 3:6){
+  Mname<-VInames[i]  #M: marginal specific covariate name
+  print(Mname)
+  
+  dat<-Dat$whole.data[, c(2,3,4,match(Mname,names(wholedat)) ) ]
+  names(dat)<-c(  'Z', 'X', 'Y', 'M' ) #for DRMR
+  apply(dat, 2, is.numeric) #TRUE TRUE TRUE TRUE
+  
+  
+  #Due to the rank variability: first randomly remove 10 individuals
+  EST_ZX<-c();EST_ZY<-c() #dim(EST) 10*1000
+  SE_ZX<-c();SE_ZY<-c() #dim(SE) 10*1000
+  MEANX<-c() #dim(MEANX) 10*1000
+  mtimes<-500
+  for(m in 1:mtimes){
+    dat_used<-dat[-sample(1:nrow(dat), 10)  ,  ]
+    
+    #stratification via DRMR and get the stratum-specific (est and s.e.) and Xmean
+    rdat<-Stratify(dat_used,onExposure = FALSE)#augmented dataset
+    SRES<-getSummaryInf(rdat) #Stratification RESults
+    
+    EST_ZX<-cbind( EST_ZX, SRES$DRres$bx );EST_ZY<-cbind( EST_ZY, SRES$DRres$by )
+    SE_ZX<-cbind(SE_ZX, SRES$DRres$bxse  );SE_ZY<-cbind(SE_ZY, SRES$DRres$byse  )
+    MEANX<-cbind( MEANX , SRES$DRres$mean)
+  }
+  ###Rubin's Rule
+  #for ZX association
+  Qbar_ZX<-apply( EST_ZX , 1, mean )
+  TT1_ZX<-apply( SE_ZX^2 , 1, mean  ) #i.e. Ubar  #a vector
+  TT2_ZX<-(1+ 1/mtimes)*(  apply(  ( EST_ZX  -   Qbar_ZX  )^2 ,1 , sum    )/(mtimes-1)  ) #a vector 
+  TT_ZX<-TT1_ZX+TT2_ZX#a vector
+  Fdf_ZX<-(mtimes -1 )*(1+ TT1_ZX/TT2_ZX)^2   #the second df for F statistic (越大，使得sqrt(F_1,df))越接近Z statistic
+  #qf(0.95, 1,Fdf_ZX )#still a vector
+  
+  #for ZY association
+  Qbar_ZY<-apply( EST_ZY , 1, mean )
+  TT1_ZY<-apply( SE_ZY^2 , 1, mean  ) #i.e. Ubar  #a vector
+  TT2_ZY<-(1+ 1/mtimes)*(  apply(  ( EST_ZY  -   Qbar_ZY  )^2 ,1 , sum    )/(mtimes-1)  ) #a vector 
+  TT_ZY<-TT1_ZY+TT2_ZY#a vector
+  Fdf_ZY<-(mtimes -1 )*(1+ TT1_ZY/TT2_ZY)^2   #the second df for F statistic (越大，使得sqrt(F_1,df))越接近Z statistic
+  #qf(0.95, 1,Fdf_ZY )#still a vector
+  
+  #for MR est: simply ignore the uncertainty of the estimated ZX association
+  MRest<-Qbar_ZY/Qbar_ZX
+  
+  ##MR estimand CI_low and CI_up based on F test statistic with ignoreing the estimated ZX association
+  ggdata<-data.frame( X = apply( MEANX ,1 ,mean)  , 
+                      Est = MRest    , 
+                      CI_low = (  Qbar_ZY- sqrt( qf(0.95, 1,Fdf_ZY ) )*sqrt( TT_ZY )   )/Qbar_ZX, 
+                      CI_up =  (   Qbar_ZY+ sqrt( qf(0.95, 1,Fdf_ZY ) )*sqrt( TT_ZY )  )/Qbar_ZX 
+  )
+  ##基于Multiple imputation后的stratum specific结果算Q statistic？
+  #here each stratum-specific ZX ZY associations are assumed to be Gaussian distributed
+  #that is, Qbar_ZX ~ N(  Q_ZX , sqrt(TT_ZX) ^2 ) where Q_ZX represents the LACE estimand
+  
+  Bx<-Qbar_ZX;Bxse<-sqrt(TT_ZX)
+  By<-Qbar_ZY;Byse<-sqrt(TT_ZY)
+  #先算effect via naive IVW under null (no effect difference) - i.e. ignore the ZX estimate uncertainty
+  Sr<-mr_ivw(mr_input(Bx, (1:10) , By, Byse))
+  delta<-Sr@Estimate #一维的
+  #Cochran's Q statistic
+  ssigma_square <- Byse^2 + delta^2*Bxse^2
+  QQ<-sum( ( By - delta*Bx     )^2 /ssigma_square      )
+  pvalue<-1-pchisq(QQ,9)
+  
+  
+  #visualization
+  
+    p <- ggplot(ggdata, aes(X, Est))+
+      geom_point(ggdata, mapping =aes(X, Est), alpha=1,size=2  )+
+      geom_errorbar(data=ggdata,mapping=aes(x=X,ymin=CI_low,ymax=CI_up),size = 0.25) +
+      geom_hline(aes(yintercept = 0),linetype='dashed',alpha=1,linewidth=1,color='grey')+
+      labs(x=paste0(Mname, " (Q statistic: ", sprintf("%.1f", round(QQ,1)) , "; pvalue: ",  sprintf("%.1f",round(pvalue,3) ) ,")"  ),
+           y='Stratum-specific estimates')+
+      coord_cartesian(ylim = c(-0.5,1.0) )+ 
+      theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+  
+  print(p)
+  ggsave(paste0('newFig4_',  i  , '.eps' ), plot = p , 
+         path='C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots', height = 4, width = 5, units = "in",limitsize=TRUE)
+}
+
+
 
