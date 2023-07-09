@@ -13,6 +13,7 @@ RFQTfit<-function(odat, #training set
                   howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                   endsize=1000,#the minimal size of the node of Q-tree allowed to exist
                   const=NA, #the pre-given fixed GX effect #only make sense when howGX='const'
+                  Cores=NA, #how many cores to be used
                   trackfile=NA #if to track the seed results? if TRUE, need to specify the redirector path (default is no path file to track; i.e. NA)
 ){
   ###data check
@@ -49,7 +50,11 @@ RFQTfit<-function(odat, #training set
   print(results)
   
   #RFQT fitting
-  n_cores_used<-detectCores()-1
+  if(is.na(Cores)){   
+    n_cores_used<-detectCores()-1
+  }else{
+    n_cores_used<-Cores
+    }
   print(paste0('The number of cores used: ',n_cores_used))
   
   if( is.na(trackfile)  ){
