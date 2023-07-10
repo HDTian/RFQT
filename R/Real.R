@@ -212,8 +212,28 @@ for(i in c(1,2,4,5,6,8)){
 
 
 
-###result4: (new Figure)---------------------------------------------------------------------------------------------------------
+###result4: (newFig_12)---------------------------------------------------------------------------------------------------------
 #according to vdat predicted HTE (i.e. v_predict), refit HTE ~ M to visualize the results or for future guidance-----------------
+
+predict_matrix2<-getPredict( ALLRES_real$RES,2     )# ALLRES_real$Predicts_test  一样的
+length( predict_matrix2[,200] ) #47395
+dim(vdat)#47395    32
+names(vdat)
+
+apply(vdat, 2, is.numeric)
+fit<-lm(  predict_matrix2[,ncol(predict_matrix2)]~ as.matrix(vdat[,5:32])     ) #共28个covariates
+summary(fit)
+
+
+dt_data<-cbind(vdat[,5:32],predict_matrix2[,200] ) #decision tree data
+apply(dt_data, 2, is.numeric)
+names(dt_data)[29]<-'estHTE'
+
+
+
+tree <- rpart(estHTE ~. , data = dt_data,control = rpart.control(minsplit  = 2,cp=0.005))#cp可以控制tree的精度
+rpart.plot(tree)#共14 leaf/end-node 
+#newFig12 650 500
 
 
 
@@ -221,12 +241,63 @@ for(i in c(1,2,4,5,6,8)){
 ###result5: (Figure S1)----------------------------------------------------------------------------------------------------------
 #permutation test results--------------------------------------------------------------------------------------------------------
 
+#single >ALLRES_real<-RFQTfit(odat,vdat,Nb=200,method='DR') with cores=7 是一个半小时
+
+
+ALLRES_real$TS
+#0.003159107 165.9386
 
 
 
+dim(odat) #94791    32  = I Z X Y + 28
+dim(vdat) #47395    32  = I Z X Y + 28
+
+TTS<-read.csv(  paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\TTS.csv'),header=T, na.strings ="?")
+
+#TTS<-c() #如果是半途再跑，小心不要设空！
 
 
+for(np in ((nrow(TTS)+1):500)){ #pb: permutation+bootstrap  #np in 1:Np
+  
+  #针对odat permutate 一次
+  Mpart<-odat[,5:ncol(odat)]
+  set.seed(np)
+  Mpart_p<-Mpart[ sample( 1:nrow(odat),nrow(odat)  ) ,  ]  #permutation 一次
+  odat_p<-cbind(  odat[, 1:4],  Mpart_p )    
+  #odat 必须要是一个data.frame  #is.data.frame(odat)  #TRUE 没毛病！
+  
+  ###same RFQT fitting for odat 
+  #注意不需要vdat，因为ts1 ts2和vdat乃至OOBdat都没关系
+  ALLRES_pb<-RFQTfit(odat_p,Nb=200,method='DR')
 
+  TTS<-rbind(TTS ,ALLRES_pb$TS   )
+
+  write.csv(TTS, paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\TTS.csv'), row.names=F)
+  print(  nrow(  TTS ) )
+  print(  as.numeric( ALLRES_pb$TS  )  )
+}
+
+###nonparametric testing analysis - Kernal density estimation
+bw.nrd0( TTS[,1] )  
+plot(density(  TTS[,1]  ),main=expression(paste("Permutation test statistic  ", S[1], " values")) )
+abline(v= 0.003159107,col='red' ) #ts1_distribution_fev1_male 500*400
+
+bw.nrd0(TTS[,2] )  # 4.547092  3.867533
+plot(density( TTS[,2]  ),main=expression(paste("Permutation test statistic  ", S[2], " values")),xlim=c(  115, 190 ))
+abline(v= 165.9386,col='red' ) #ts2_distribution_fev1_male 500*400
+
+#其实没必要依据Kernel smoohting结果来算p-value，因为这会包含smoothing的error
+#直接用nonparameteric! review: Kernel本身就是一种parametric！
+
+
+Bernoulli_ts1<-(final_ts1>=0.002438205)
+Bernoulli_ts2<-(final_ts2>=189.3867)
+
+#样本数不够大！不够接近continuous的Normal distribution！还是用GLM吧
+myf<-function(x){   exp(x)/(1+ exp(x)    ) }
+fit1<-summary(glm(Bernoulli_ts1 ~ 1, family =binomial(link = "logit") ))
+
+myf(  coef(fit1)[1] ) ;   myf(  coef(fit1)[1]+c(-1,1)*1.96*coef(fit1)[2] )   
 
 
 
