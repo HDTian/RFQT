@@ -290,10 +290,10 @@ abline(v= 165.9386,col='red' ) #ts2_distribution_fev1_male 500*400
 #直接用nonparameteric! review: Kernel本身就是一种parametric！
 
 
-Bernoulli_ts1<-(final_ts1>=0.002438205)
-Bernoulli_ts2<-(final_ts2>=189.3867)
+Bernoulli_ts1<-(TTS[,1]>=0.003159107)
+Bernoulli_ts2<-(TTS[,2]>=165.9386)
 
-#样本数不够大！不够接近continuous的Normal distribution！还是用GLM吧
+#由于样本数不够大！不够接近continuous的Normal distribution！还是用GLM吧
 myf<-function(x){   exp(x)/(1+ exp(x)    ) }
 fit1<-summary(glm(Bernoulli_ts1 ~ 1, family =binomial(link = "logit") ))
 
