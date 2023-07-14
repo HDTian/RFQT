@@ -10,6 +10,7 @@ getDat<-function(N=150000,
                  scenario='A', #'A' 'B' or other character (i.e. 'C')
                  SoM=0.5, #SoM: strength of modification (i.e. gamma)
                  ZXeffect=0.5,  #instrument effect/strength
+                 Random=TRUE, #if use the random value, N(0,0.1^2), for the strenght of modifcation
                  label=TRUE, #if to added the final column as the true HTE (i.e. label)
                  split=TRUE  #traning-testing split or not? if not, there is only one complete data
 ){
@@ -38,8 +39,12 @@ getDat<-function(N=150000,
     }
   }
   
-  
-  modifier_vec<-c(  rnorm(5,gamma,0.1) , rep( 0,JJ-5 ) )    #前5个存在effect-modification (modification strength = gamma)
+  if(Random){  
+    modifier_vec<-c(  rnorm(5,gamma,0.1) , rep( 0,JJ-5 ) )    #前5个存在effect-modification (modification strength = gamma)
+  }else{
+    modifier_vec<-c(  rnorm(5,gamma,0) , rep( 0,JJ-5 ) )    #前5个存在effect-modification (modification strength = gamma)
+    }
+ 
   ##Y: the outcome vector
   Y<-(0.5+MM%*%modifier_vec   )*X+ UU%*%rep(0.5,JJ) +e2
   
