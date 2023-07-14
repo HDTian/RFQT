@@ -12,7 +12,7 @@ getDat<-function(N=150000,
                  ZXeffect=0.5,  #instrument effect/strength
                  Random=TRUE, #if use the random value, N(0,0.1^2), for the strenght of modifcation
                  label=TRUE, #if to added the final column as the true HTE (i.e. label)
-                 split=TRUE  #traning-testing split or not? if not, there is only one complete data
+                 split=TRUE  #traning-testing split or not? and if store other information? if not, there is only one complete data and no other information
 ){
   gamma<-SoM
   NNNN<-N; NNN<-Nt
@@ -68,7 +68,7 @@ getDat<-function(N=150000,
     vdat$true_STE<-The_true_STE[  (NNN+1):NNNN ]
   }
   if(split == TRUE){
-    return(   list( whole.data=Dat, traning.set=odat , testing.set = vdat   ))
+    return(   list( whole.data=Dat, traning.set=odat , testing.set = vdat, SoM=gamma , modifier_vec=modifier_vec ,Scenario=scenario   ))
   }else{
     return(Dat)
   }
