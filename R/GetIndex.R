@@ -9,6 +9,7 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
                    method='DR',#stratification method used : 'DR' 'Residual' others
                    SoP=10,#size of pre-stratum  #SoP=10: better for operation: (1,1,1,2,2,3,3,4,4,4)
                    howGX='SpecificGX', #how to caculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                   Halve=FALSE, #if only use half splitting? Default is FALSE, i.e. use three splitting possiblies: (3:7) (5:5) (7:3)
                    const=NA){
   N<-dim( dat_current )[1]
   ###getIndex这个函数不适合通过dat_current来计算JJ，因为在tree growth中，dat_current会不断增广
@@ -69,7 +70,9 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
     #split style 3: 1111111   222
     QQs<-c() #final length of QQs: 3
     Size<-c() #store the minial node size for each split
-    for(dd in 1:3){
+    
+    if(Halve){ dd_candidates<-2    }else{ dd_candidates<-1:3  }
+    for(dd in dd_candidates){ #原本是 dd in 1:3； 如果只用Halve 则dd in 2
       strata_range<-list()
       strata_range[[1]]<-(1:4)[1:dd]
       strata_range[[2]]<-(1:4)[-(1:dd)]
@@ -112,10 +115,17 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
   ##result storage
   row_col<-which(QQs_allM == max(QQs_allM), arr.ind = TRUE) #vector of 2 elements: the row and col index
   results<-c(  Mcandidates[row_col[1]],  max(QQs_allM), Size_allM[row_col[1],row_col[2]] , row_col[2]  )
+  
+  if(Halve){ results[4]<-results[4]+1   }#为了让split.style的数字为2，此时对应着5:5
+  
   names(results  )<-c(  'Candidate.index', 'Q.value' , 'minimal.node.size.after.split','split.style' )
   return( results) #返回M编号 和 最大的Q值 和此时date (没分之前的)sample size [这两个用在stoping rule]
 }
 #返回 1.M编号 和 2.对应的最大的Q值 和 3.此时date分之后的最小的node size [这两个用在stoping rule] 4.split.style
+
+
+#splitting style:
+#1为 3：7   2为5：5    3为7：3
 
 ###exmaples:
 set.seed(60)

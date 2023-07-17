@@ -11,6 +11,7 @@ RFQTfit<-function(odat, #training set
                   method='DR',#stratification method used: 'DR' 'Residual' others
                   SoP=10,##size of pre-stratum #only make sense to DR stratification
                   howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                  Halve=FALSE, #if only use half splitting? Default is FALSE, i.e. use three splitting possiblies: (3:7) (5:5) (7:3)
                   endsize=1000,#the minimal size of the node of Q-tree allowed to exist
                   const=NA, #the pre-given fixed GX effect #only make sense when howGX='const'
                   Cores=NA, #how many cores to be used
@@ -29,10 +30,11 @@ RFQTfit<-function(odat, #training set
   my.method<-method
   my.SoP<-SoP
   my.howGX<-howGX
+  my.Halve<-Halve
   my.endsize<-endsize
   my.const<-const
   if(as.matrix(is.na(vdat))[1,1]){  vdat_information<-'NA'  }else{ vdat_information<-nrow(vdat)}
-  results<-c( JJ, nrow(odat), vdat_information , honest , method , SoP , rate, SingleM, S , howGX, const, endsize, Qthreshold )
+  results<-c( JJ, nrow(odat), vdat_information , honest , method , SoP , rate, SingleM, S , howGX, Halve,const, endsize, Qthreshold )
   print('Below is the summary of the parameters used for RFQT fitting')
   names(results)<-c( 'number.of.candidates.covariate',
                      'training.data.size',
@@ -44,6 +46,7 @@ RFQTfit<-function(odat, #training set
                      'use.single.stratification',
                      'max.tree.deep' ,
                      'instrument-exposure.style',
+                     'Halve.split.only',
                      'GXeffect.value',
                      'min.end.node.size',
                      'Q.value.threshold')
@@ -77,6 +80,7 @@ RFQTfit<-function(odat, #training set
                               method=my.method,
                               SoP=my.SoP,
                               howGX=my.howGX,
+                              Halve=my.Halve,
                               endsize=my.endsize,
                               const=my.const)
     return(RES)

@@ -10,6 +10,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
                   method='DR', #'DR' 'Residual' others
                   SoP=10, #size of pre-stratum #only make sense to DR stratification
                   howGX='SpecificGX',#'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                  Halve=FALSE, #if only use half splitting? Default is FALSE, i.e. use three splitting possiblies: (3:7) (5:5) (7:3)
                   const=NA, #only make sense when howGX='const'
                   endsize=1000 #the minimal size of the node of Q-tree allowed to exist. S and endsize work in a similar way. #only makes sense for GetTree
 ){
@@ -42,6 +43,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
                         method=method,
                         SoP=SoP,
                         howGX=howGX,
+                        Halve=Halve,
                         const=const)  #GetIndex function result       #这行代码占了一半！
         J_<-GIres[1] #每次用之前记得指定处理这个dat中M的数量;GetIndex已经自动随机patrial选择M candidates了
         #这里主要是告诉我们用哪个M的

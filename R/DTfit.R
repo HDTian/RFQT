@@ -14,6 +14,7 @@ DTfit<-function(Odat=odat,  #inputted training data
                 method='DR',#stratification method used: 'DR' 'Residual' others
                 SoP=10, ##size of pre-stratum #only make sense to DR stratification
                 howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                Halve=FALSE, #if only use half splitting? Default is FALSE, i.e. use three splitting possiblies: (3:7) (5:5) (7:3)
                 endsize=1000,##the minimal size of the node of Q-tree allowed to exist
                 const=NA){
   if( is.null(Odat$true_STE[1]) ){JJ<-ncol( Odat )-4}else{JJ<-ncol( Odat )-5}
@@ -46,6 +47,7 @@ DTfit<-function(Odat=odat,  #inputted training data
                            method=method,#stratification method used
                            SoP=SoP,#size of pre-stratum  #SoP=10: better for operation: (1,1,1,2,2,3,3,4,4,4)
                            howGX=howGX, #how to calculate the GX effect?  'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
+                           Halve=Halve, #if only use half splitting? Default is FALSE, i.e. use three splitting possiblies: (3:7) (5:5) (7:3)
                            const=const)
     SpecificM_used<-GetIndex_res[1]
   }else{
@@ -60,6 +62,7 @@ DTfit<-function(Odat=odat,  #inputted training data
                  method=method,
                  SoP=SoP,
                  howGX=howGX,
+                 Halve=Halve, 
                  const=const,
                  endsize=endsize)  #返回rdat这个data.frame  ;  GetTree是最耗时的function
   
