@@ -102,7 +102,7 @@ Label_names<-c('Diastolic blood pressure (mmHg)',
 #devtools::install_github("HDTian/DRMR")
 library(DRMR)
 
-for(i in c(1,2,4,5,6,8)){
+for(i in c(1:8)){
   Mname<-VInames_chosen[i]  #M: marginal specific covariate name
   print(Mname)
   dat<-Dat[,     c(   2 ,3,4, match(Mname,names(Dat)   ) ) ]
@@ -111,6 +111,8 @@ for(i in c(1,2,4,5,6,8)){
   
   
   #Due to the rank variability: first randomly remove 10 individuals
+  set.seed(i)
+  
   EST_ZX<-c();EST_ZY<-c() #dim(EST) 10*1000
   SE_ZX<-c();SE_ZY<-c() #dim(SE) 10*1000
   MEANX<-c() #dim(MEANX) 10*1000
@@ -152,7 +154,17 @@ for(i in c(1,2,4,5,6,8)){
                       CI_low = (  Qbar_ZY- sqrt( qf(0.95, 1,Fdf_ZY ) )*sqrt( TT_ZY )   )/Qbar_ZX, 
                       CI_up =  (   Qbar_ZY+ sqrt( qf(0.95, 1,Fdf_ZY ) )*sqrt( TT_ZY )  )/Qbar_ZX 
                       )
-  ##基于Multiple imputation后的stratum specific结果算Q statistic？
+  
+  ##also store some other metrics (possible for some trend test)
+  ggdata$ZXEst<-Qbar_ZX
+  ggdata$ZYEst<-Qbar_ZY
+  ggdata$TT_ZX<-TT_ZX
+  ggdata$TT_ZY<-TT_ZY
+  ggdata$Fdf_ZX<-Fdf_ZX
+  ggdata$Fdf_ZY<-Fdf_ZY
+  
+  
+  ##基于Multiple imputation后的stratum specific结果算Q statistic
   #here each stratum-specific ZX ZY associations are assumed to be Gaussian distributed
   #that is, Qbar_ZX ~ N(  Q_ZX , sqrt(TT_ZX) ^2 ) where Q_ZX represents the LACE estimand
   
@@ -165,8 +177,10 @@ for(i in c(1,2,4,5,6,8)){
   ssigma_square <- Byse^2 + delta^2*Bxse^2
   QQ<-sum( ( By - delta*Bx     )^2 /ssigma_square      )
   pvalue<-1-pchisq(QQ,9)
+  print(c(QQ,pvalue)  )
   
   
+  write.csv(ggdata, paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\',"ggdata_",i, '_',QQ,'_',pvalue  , '.csv'), row.names=F)
   #visualization
   
   if(!i%in%c(3,7)){
@@ -202,14 +216,32 @@ for(i in c(1,2,4,5,6,8)){
       theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
   }
   print(p)
-  ggsave(paste0('Fig5_',  i  , '.eps' ), plot = p , 
-          path='C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots', height = 4, width = 5, units = "in",limitsize=TRUE)
+  #ggsave(paste0('newFig5_',  i  , '.eps' ), plot = p , 
+  #        path='C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots', height = 4, width = 5, units = "in",limitsize=TRUE)
 }
 
 
 
 
 
+#calculate according to stored ggdata
+library(metafor)
+for(i in c(1:8)){
+  ggdata<-read.csv( paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\',"ggdata_",i  , '.csv'), header=T,na.strings ="?" )
+  #meta test
+  ggdata$se<-sqrt(  ggdata$TT_ZY )/ggdata$ZXEst
+  metafit <- rma(   yi=Est, sei=se, mods =X, data = ggdata)#Meta-Analysis via Linear (Mixed-Effects) Models
+  metafit$pval[2]
+  print(  c(metafit$b[2],metafit$pval[2])   )
+}
+
+#0.000835455 0.031582901
+#-2.191135e-03  1.154498e-05
+#-0.0008223616  0.6296620086
+#-0.0008337395  0.0017211867
+#-0.000163299  0.719075015
+#0.009122741 0.002549079
+#-0.002419915  0.006404262
 
 
 ###result4: (newFig_12)---------------------------------------------------------------------------------------------------------
@@ -248,12 +280,12 @@ ALLRES_real$TS
 #0.003159107 165.9386
 
 
-
+#请确保是real data的odat! 不要是simulation的odat
 dim(odat) #94791    32  = I Z X Y + 28
 dim(vdat) #47395    32  = I Z X Y + 28
 
 TTS<-read.csv(  paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\TTS.csv'),header=T, na.strings ="?")
-
+nrow(  TTS )
 #TTS<-c() #如果是半途再跑，小心不要设空！
 
 
@@ -276,15 +308,15 @@ for(np in ((nrow(TTS)+1):500)){ #pb: permutation+bootstrap  #np in 1:Np
   print(  nrow(  TTS ) )
   print(  as.numeric( ALLRES_pb$TS  )  )
 }
-
+nrow(  TTS )
 ###nonparametric testing analysis - Kernal density estimation
 bw.nrd0( TTS[,1] )  
-plot(density(  TTS[,1]  ),main=expression(paste("Permutation test statistic  ", S[1], " values")) )
-abline(v= 0.003159107,col='red' ) #ts1_distribution_fev1_male 500*400
+plot(density(  TTS[,1]  ),main=expression(paste("Permutation test statistic  ", S[1], " values")) , xlim=c(0.002, 0.005))
+abline(v= 0.003159107,col='red' ) #FigS1_1 500*400
 
 bw.nrd0(TTS[,2] )  # 4.547092  3.867533
 plot(density( TTS[,2]  ),main=expression(paste("Permutation test statistic  ", S[2], " values")),xlim=c(  115, 190 ))
-abline(v= 165.9386,col='red' ) #ts2_distribution_fev1_male 500*400
+abline(v= 165.9386,col='red' ) #FigS1_2 500*400
 
 #其实没必要依据Kernel smoohting结果来算p-value，因为这会包含smoothing的error
 #直接用nonparameteric! review: Kernel本身就是一种parametric！
@@ -298,7 +330,8 @@ myf<-function(x){   exp(x)/(1+ exp(x)    ) }
 fit1<-summary(glm(Bernoulli_ts1 ~ 1, family =binomial(link = "logit") ))
 
 myf(  coef(fit1)[1] ) ;   myf(  coef(fit1)[1]+c(-1,1)*1.96*coef(fit1)[2] )   
-
+#0.06923077     
+#0.0364122 0.1277086   #130 
 
 
 
