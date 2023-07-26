@@ -138,7 +138,7 @@ DTfit<-function(Odat=odat,  #inputted training data
   ##注意：NNindex和MRest构成了重要的tree end-node information 即使MRest可能是由estdat估计出来的
   
   
-  ###RESULT 1:testing set predicts (没有OOB set predicts)
+  ###RESULT 1:testing set predicts (没有OOB set predicts) 
   #testing set individual predicted predicted values
   #(如果没有testing set，那么就把v_predict设空)
   if(as.matrix(is.na(Vdat))[1,1]){
@@ -161,6 +161,17 @@ DTfit<-function(Odat=odat,  #inputted training data
   ts2<-sum( ( By - delta*Bx     )^2 /ssigma_square      )#critical value:  qchisq(0.95, NC-1)==3.841459
   RES$ts1<-ts1
   RES$ts2<-ts2
+  
+  
+  ###RESULT 4: testing MSE
+  #(如果没有testing set，那么就把MSE设空)
+  if(as.matrix(is.na(Vdat))[1,1]){
+      RES$MSE<-NA   }else{
+        if(  is.null(  Vdat$true_STE   ) ){  #p判断是否有label   
+          RES$MSE<-NA    }else{
+            RES$MSE<-  mean( ( theMRest- Vdat$true_STE   )^2   )
+  }
+  
   
   return( RES )
 }
