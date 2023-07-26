@@ -170,14 +170,16 @@ DTfit<-function(Odat=odat,  #inputted training data
         if(  is.null(  Vdat$true_STE   ) ){  #p判断是否有label   
           RES$MSE<-NA    }else{
             RES$MSE<-  mean( ( theMRest- Vdat$true_STE   )^2   )
-  }
+          }
+      }
+  
   
   
   return( RES )
 }
 
 
-#RES包括：$end_node_information  $v_predict  $ts1  $ts2
+#RES包括：$end_node_information  $v_predict  $ts1  $ts2 $MSE
 #不需要getMSE算MSE，直接自己算即可
 
 
@@ -188,7 +190,10 @@ odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 
 DTRES<-DTfit(odat,vdat)
-#get (testing set) MSE
+
+DTRES
+
+#get (testing set) MSE manually
 mean( ( DTRES$v_predict - vdat$true_STE   )^2   )
 
 
