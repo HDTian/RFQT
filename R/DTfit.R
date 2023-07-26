@@ -173,13 +173,14 @@ DTfit<-function(Odat=odat,  #inputted training data
           }
       }
   
-  
+  ###RESULT 5: rdat: see the tree structure
+  RES$rdat<-rdat
   
   return( RES )
 }
 
 
-#RES包括：$end_node_information  $v_predict  $ts1  $ts2 $MSE
+#RES包括：$end_node_information  $v_predict  $ts1  $ts2 $MSE $rdat
 #不需要getMSE算MSE，直接自己算即可
 
 
