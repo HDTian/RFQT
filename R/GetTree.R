@@ -123,7 +123,8 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
   
   return(rdat)
 }
-
+#关于infvec_s；数字依次为
+#第一个为candidiate variable index; 第二个为left/right sub-node;第三个为single-valued summary information;第四个为splitting style
 
 #返回一个和inputed dat增广的dat set(包含每轮s生长的tree information)
 
