@@ -185,7 +185,7 @@ DTfit<-function(Odat=odat,  #inputted training data
 
 ###examples:
 set.seed(60)
-res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+res<-getDat() #simulated data  #the default setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
 
