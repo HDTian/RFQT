@@ -8,7 +8,7 @@ RFQTfit<-function(odat, #training set
                   rate=0.4,# the proportion of candidate variables Ms considered
                   SingleM=FALSE,#whether to ue single stratification style?(i,e, use a fixed M determined in the begining)
                   Qthreshold=3.84, ##the threshold for Q heterogneity assessment
-                  method='DR',#stratification method used: 'DR' 'Residual' others
+                  method='DR',#stratification method used: 'DR' 'Residual' others are naive stratification
                   SoP=10,##size of pre-stratum #only make sense to DR stratification
                   howGX='SpecificGX',##'const' means use extra constant; otherwise estimated by stratum data (stratum-specific GXeffect)
                   Halve=FALSE, #if only use half splitting? Default is FALSE, i.e. use three splitting possiblies: (3:7) (5:5) (7:3)
@@ -34,7 +34,10 @@ RFQTfit<-function(odat, #training set
   my.endsize<-endsize
   my.const<-const
   if(as.matrix(is.na(vdat))[1,1]){  vdat_information<-'NA'  }else{ vdat_information<-nrow(vdat)}
-  results<-c( JJ, nrow(odat), vdat_information , honest , method , SoP , rate, SingleM, S , howGX, Halve,const, endsize, Qthreshold )
+  method_use<-'naive method'
+  if( method=='DR' ){  method_use<-'Doubly-ranked method'  }
+  if( method=='Residual' ){  method_use<-'Residual method'  }
+  results<-c( JJ, nrow(odat), vdat_information , honest , method_use , SoP , rate, SingleM, S , howGX, Halve,const, endsize, Qthreshold )
   print('Below is the summary of the parameters used for RFQT fitting')
   names(results)<-c( 'number.of.candidates.covariate',
                      'training.data.size',
