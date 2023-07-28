@@ -2,7 +2,7 @@
 
 RFQTfit<-function(odat, #training set
                   vdat=NA, #validation set (can be empty)
-                  Nb=5,  # the number of Q-trees
+                  Nb=5,  # the number of Q-trees #if this is single number: # of trees; if this is a vector: the seed index for parSapply 
                   S=5, #the largest depth
                   honest=FALSE, #use honest estimation or not?
                   rate=0.4,# the proportion of candidate variables Ms considered
@@ -96,7 +96,11 @@ RFQTfit<-function(odat, #training set
   #                                     'my.honest','my.S','my.rate','my.SingleM','my.Qthreshold','my.method','my.SoP','my.howGX','my.endsize','my.const',
   #                                     'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
   clusterExport(  cl=cl ,  varlist=c( 'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting'))
-  RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting )
+  if( length(Nb)==1 ){   
+    RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting )    
+    }else{
+      RES<-parSapply(   cl ,  Nb, user_BootstrapTreeFitting )
+      }
   stopCluster(cl)
   
   ###results--------------------------------------------------------------------
