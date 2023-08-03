@@ -1,4 +1,6 @@
 
+#中文
+
 #get the present values of all the relevant parameters and if not defined the default value 
 getPars<-function(empty.argument){
   if( !exists('odat') ){ odat<-NA
