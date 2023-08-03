@@ -232,16 +232,20 @@ for(i in c(1:8)){
   ggdata$se<-sqrt(  ggdata$TT_ZY )/ggdata$ZXEst
   metafit <- rma(   yi=Est, sei=se, mods =X, data = ggdata)#Meta-Analysis via Linear (Mixed-Effects) Models
   metafit$pval[2]
-  print(  c(metafit$b[2],metafit$pval[2])   )
+  meta_res<-c( metafit$tau2  , metafit$b[2],metafit$pval[2])
+  names(meta_res)<-c( 'tau^2' , 'est_parameter ' , ' p-value'  )
+  print(   meta_res  )
 }
 
-#0.000835455 0.031582901
-#-2.191135e-03  1.154498e-05
-#-0.0008223616  0.6296620086
-#-0.0008337395  0.0017211867
-#-0.000163299  0.719075015
-#0.009122741 0.002549079
-#-0.002419915  0.006404262
+#     tau^2    est_parameter     p-value  
+#0.000000000    0.000835455    0.031582901  "dbp" 
+#0.000000e+00  -2.191135e-03   1.154498e-05   "hip"  
+#0.0000000000  -0.0008223616   0.6296620086 "monos"  
+#0.0000000000  -0.0008337395   0.0017211867  "wt"
+#1.980148e-06  -1.632990e-04   7.190750e-01 "ages"
+#0.000000000    0.009122741    0.002549079  "vitcap" 
+#0.000000000   -0.002419915    0.006404262 "bmi"
+#0.000000e+00   6.200019e-05   9.065071e-01 "ht"
 
 
 ###result4: (newFig_12)---------------------------------------------------------------------------------------------------------
@@ -261,12 +265,19 @@ dt_data<-cbind(vdat[,5:32],predict_matrix2[,200] ) #decision tree data
 apply(dt_data, 2, is.numeric)
 names(dt_data)[29]<-'estHTE'
 
-
+names(dt_data)[8]<-'hip circumference'
+names(dt_data)[3]<-'diastolic blood pressure'
+names(dt_data)[13]<-'leucocyte count'
+names(dt_data)[7]<-'waist circumference'
+names(dt_data)[28]<-'vital capacity'
+names(dt_data)[25]<-'platelet count'
+names(dt_data)[22]<-'monocyte count'
+names(dt_data)[5]<-'weight'
 
 tree <- rpart(estHTE ~. , data = dt_data,control = rpart.control(minsplit  = 2,cp=0.005))#cp可以控制tree的精度
 rpart.plot(tree)#共14 leaf/end-node 
 #newFig12 650 500
-
+#newnewFig12 680 450
 
 
 

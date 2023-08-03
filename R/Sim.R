@@ -26,6 +26,7 @@ for(s in c('A','B','C')){
     DTRES<-DTfit(odat,vdat,method='DR')
     saveRDS(DTRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\DT_DR_',scenario_used,'_',gamma_used,'.RData'))
     #DTRES<-readRDS(file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\DT_DR_',scenario_used,'_',gamma_used,'.RData'))
+    #mean( ( DTRES$v_predict - vdat$true_STE   )^2   )
     
     ###R
     DTRES<-DTfit(odat,vdat,method='Residual')
@@ -40,6 +41,7 @@ for(s in c('A','B','C')){
     ###DR
     ALLRES<-RFQTfit(odat,vdat,Nb=200,method='DR')
     saveRDS(ALLRES,file=paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_DR_',scenario_used,'_',gamma_used,'.RData'))
+    #ALLRES<-readRDS(paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_DR_',scenario_used,'_',gamma_used,'.RData'))
     #ALLRES$MSE_test[length(ALLRES$MSE_test)] 
     
     ###R
@@ -233,11 +235,11 @@ ggsave(paste0('Fig7_right.eps' ),   #.eps  #real以后都特指R3： BMI on fev1
 
 ##Results3: (newFig1)-------------------------------------------------------------------------------------------------------------------
 #scatter plot of true HTE v.s. est HTE--------------------------------------------------------------------------------------------------
-plot(   ALLRES$Predicts_test[,500],vdat$true_STE  )
+plot(   ALLRES$Predicts_test[,ncol(  ALLRES$Predicts_test  )],vdat$true_STE  )
 abline(0,1,col='red')
 
 #ggplot
-ggdata<-data.frame(estHTE=ALLRES$Predicts_test[,500], trueHTE=vdat$true_STE )
+ggdata<-data.frame(estHTE=ALLRES$Predicts_test[,ncol(  ALLRES$Predicts_test  )], trueHTE=vdat$true_STE )
 set.seed(1123)
 ggdata<-ggdata[ sample( 1:nrow(ggdata),1000  ) , ]
 p<-ggplot(ggdata) +
@@ -252,6 +254,41 @@ ggsave(paste0('newFig1.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 fo
        plot =p ,  #非指定 
        path=paste0('C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots'), 
        height = 5, width = 5, units = "in",limitsize=TRUE)
+
+
+###* now with three scenarios (not for the sim500.RData)
+
+for(scenario_used in c('A','B','C')){
+  i=6
+  Gammas<-c( 0, 0.1, 0.2, 0.3 ,0.4 ,0.5    )#共6中SoM情况
+  set.seed(10*i)
+  gamma_used<-Gammas[i]
+  #get data
+  Dat<-getDat(scenario=scenario_used, SoM=gamma_used)
+  odat<-Dat$traning.set  #training set in 全局环境
+  vdat<-Dat$testing.set  #testing set in 全局环境
+  ALLRES<-readRDS(paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_DR_',scenario_used,'_',gamma_used,'.RData'))
+  ggdata<-data.frame(estHTE=ALLRES$Predicts_test[,ncol(  ALLRES$Predicts_test  )], trueHTE=vdat$true_STE  )
+  set.seed(1123)
+  ggdata<-ggdata[ sample( 1:nrow(ggdata),1000  ) , ]
+  p<-ggplot(ggdata) +
+    geom_abline(intercept = 0, slope = 1, colour='grey', linewidth=1.0 ,linetype = 2)+
+    geom_hline(yintercept = 0, colour='grey', linewidth=1.0 ,linetype = 2)+
+    geom_vline(xintercept = 0, colour='grey', linewidth=1.0 ,linetype = 2)+
+    geom_point(aes(estHTE,trueHTE),size = 1) +
+    xlab('Predicted effects')+ylab('True effects')+
+    theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+  p
+  ggsave(paste0('newnewFig1_', scenario_used ,'.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for the female
+         plot =p ,  #非指定 
+         path=paste0('C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots'), 
+         height = 5, width = 5, units = "in",limitsize=TRUE)
+}
+  
+
+
+
+
 
 
 ##Results4: (newFig2)-----------------------------------------------------------------------------------------------------------
@@ -286,7 +323,53 @@ ggsave(paste0('newFig2_right.eps' ),   #.eps  #real以后都特指R3： BMI on f
        path=paste0('C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots'), 
        height = 6, width = 4, units = "in",limitsize=TRUE)
 
-
+###* now with three scenarios (not for the sim500.RData)
+for(scenario_used in c('A','B','C')){
+  i=6
+  Gammas<-c( 0, 0.1, 0.2, 0.3 ,0.4 ,0.5    )#共6中SoM情况
+  set.seed(10*i)
+  gamma_used<-Gammas[i]
+  #get data
+  Dat<-getDat(scenario=scenario_used, SoM=gamma_used)
+  odat<-Dat$traning.set  #training set in 全局环境
+  vdat<-Dat$testing.set  #testing set in 全局环境
+  ALLRES<-readRDS(paste0('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\RFQT_DR_',scenario_used,'_',gamma_used,'.RData'))
+  
+  
+  if(scenario_used=='A'){limitrange<-c(0,0.8)}
+  if(scenario_used=='B'){limitrange<-c(0,3.3)}
+  if(scenario_used=='C'){limitrange<-c(0,4.5)}
+  names(odat)[5:24]<-paste0('M',1:20)
+  #left - VI1
+  VIindex<-order(ALLRES$VI1)#得出一组position index用以表示最小到最大unit的各自的位置 
+  ggdata_VI<-data.frame(candidate=factor(names(odat)[VIindex+4],levels =(names(odat)[VIindex+4])[length(VIindex):1] ),  #逆向排序
+                        VI=( ALLRES$VI1 )[VIindex]   )  
+  p<-ggplot(ggdata_VI,aes(x=candidate,y=VI))+geom_col( )+
+    xlab('Candidate covariate')+ylab('Variable Importance')+#labs(title=c('Doubly-ranked method', 'Residual method' , 'Naive method'   )[RESindex] )+
+    ylim( limitrange  )+
+    theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+
+    coord_flip()
+  p
+  ggsave(paste0('newnewFig2_',scenario_used ,'left.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for the female
+         plot =p ,  #非指定 
+         path=paste0('C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots'), 
+         height = 5, width = 5, units = "in",limitsize=TRUE)
+  
+  #right - VI2
+  VIindex<-order(ALLRES$VI2)#得出一组position index用以表示最小到最大unit的各自的位置 
+  ggdata_VI<-data.frame(candidate=factor(names(odat)[VIindex+4],levels =(names(odat)[VIindex+4])[length(VIindex):1] ),  #逆向排序
+                        VI=( ALLRES$VI2 )[VIindex]   )  
+  p<-ggplot(ggdata_VI,aes(x=candidate,y=VI))+geom_col( )+
+    xlab('Candidate covariate')+ylab('Variable Importance')+#labs(title=c('Doubly-ranked method', 'Residual method' , 'Naive method'   )[RESindex] )+
+    ylim( limitrange  )+
+    theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+
+    coord_flip()
+  p
+  ggsave(paste0('newnewFig2_',scenario_used ,'right.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for the female
+         plot =p ,  #非指定 
+         path=paste0('C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots'), 
+         height = 5, width = 5, units = "in",limitsize=TRUE)
+}
 
 ##Result5: (newFig3)------------------------------------------------------------------------------------------------------------------
 #according to vdat predicted HTE (i.e. v_predict), refit HTE ~ M to visualize the results or for future guidance----------------------
