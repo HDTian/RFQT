@@ -128,11 +128,11 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
 #1为 3：7   2为5：5    3为7：3
 
 ###exmaples:
-set.seed(60)
-res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
-GetIndex(odat,JJ=20)
+#set.seed(60)
+#res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
+#odat<-res$traning.set  #training set
+#vdat<-res$testing.set  #testing set
+#GetIndex(odat,JJ=20)
 #Candidate.index         Q.value       node.size
 #         3.0000        324.7219     100000.0000
 

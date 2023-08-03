@@ -55,11 +55,11 @@ getPredict<-function(RES,#RES为parSapply(   cl ,  1:100, BootstrapTreeFitting  )
 #getPredict returns a matrix (individual number * Nb): 表示随着tree的增长目前的forest下的各个individual的predicted effects (即HTE)
 
 
-###examples:
-#RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
-
-predict_matrix<-getPredict(RES,indicator=1 )
-predict_matrix<-getPredict(RES,indicator=2 )
-
-dim(predict_matrix)
-View(predict_matrix)
+# ###examples:
+# #RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
+# 
+# predict_matrix<-getPredict(RES,indicator=1 )
+# predict_matrix<-getPredict(RES,indicator=2 )
+# 
+# dim(predict_matrix)
+# View(predict_matrix)

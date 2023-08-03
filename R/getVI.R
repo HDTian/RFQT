@@ -51,7 +51,7 @@ getVI<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹
 
 ###example:
 #RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
-
-getVI(RES,VItype=1 )
-getVI(RES,VItype=2 )
+# 
+# getVI(RES,VItype=1 )
+# getVI(RES,VItype=2 )
 

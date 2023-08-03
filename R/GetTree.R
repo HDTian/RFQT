@@ -129,13 +129,13 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
 #返回一个和inputed dat增广的dat set(包含每轮s生长的tree information)
 
 ###exmaples:
-set.seed(60)
-res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
-rdat<-GetTree(odat)
+#set.seed(60)
+#res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
+#odat<-res$traning.set  #training set
+#vdat<-res$testing.set  #testing set
+#rdat<-GetTree(odat)
 
-#easy check
-View(rdat)
-table(rdat$infvec_3)
+###easy check
+#View(rdat)
+#table(rdat$infvec_3)
 

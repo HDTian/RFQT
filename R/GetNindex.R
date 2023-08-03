@@ -44,32 +44,32 @@ GetNindex<-function(M,  #variable information matrix; the M colnumber and order 
   return( theNindex  ) #返回这个vector 结果
 }
 
-###examples:
-set.seed(60)
-res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
-
-rdat<-GetTree(odat)
-
-
-vdat_Nindex<-GetNindex(vdat[,5:24] ,rdat )#the M colnumber and order should be same as the training data
-
-
-#may use another independent data (estimation data) to calculate the endnode-specific IV/MR estimates
-
-#for example: let odat halves into trdata (tree data) and estdata (estimation data); also have rdat<-GetTree(trdata)
-
-trdat<-odat[1: (nrow(odat)/2) ,]#tree data
-estdat<-odat[(nrow(odat)/2+1):nrow(odat) ,] #estimaiton data
-
-rdat<-GetTree(trdat)#fitted Q tree
-
-estdat$Nindex<-GetNindex(estdat[,5:24] ,rdat )#rdat contains the tree information (i.e. decision rule)
-
-#according to estdata calculate the Nindex-specific MR estimates
-#后续的代码和BooststraptreeFitting一样
-
+# ###examples:
+# set.seed(60)
+# res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
+# odat<-res$traning.set  #training set
+# vdat<-res$testing.set  #testing set
+# 
+# rdat<-GetTree(odat)
+# 
+# 
+# vdat_Nindex<-GetNindex(vdat[,5:24] ,rdat )#the M colnumber and order should be same as the training data
+# 
+# 
+# #may use another independent data (estimation data) to calculate the endnode-specific IV/MR estimates
+# 
+# #for example: let odat halves into trdata (tree data) and estdata (estimation data); also have rdat<-GetTree(trdata)
+# 
+# trdat<-odat[1: (nrow(odat)/2) ,]#tree data
+# estdat<-odat[(nrow(odat)/2+1):nrow(odat) ,] #estimaiton data
+# 
+# rdat<-GetTree(trdat)#fitted Q tree
+# 
+# estdat$Nindex<-GetNindex(estdat[,5:24] ,rdat )#rdat contains the tree information (i.e. decision rule)
+# 
+# #according to estdata calculate the Nindex-specific MR estimates
+# #后续的代码和BooststraptreeFitting一样
+# 
 
 
 

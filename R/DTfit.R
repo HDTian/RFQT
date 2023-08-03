@@ -183,19 +183,19 @@ DTfit<-function(Odat=odat,  #inputted training data
 #RES包括：$end_node_information  $v_predict  $ts1  $ts2 $MSE $rdat
 #不需要getMSE算MSE，直接自己算即可
 
-
-###examples:
-set.seed(60)
-res<-getDat() #simulated data  #the default setting: scenario='A' and SoM=0.5
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
-
-DTRES<-DTfit(odat,vdat)
-
-DTRES
-
-#get (testing set) MSE manually
-mean( ( DTRES$v_predict - vdat$true_STE   )^2   )
+# 
+# ###examples:
+# set.seed(60)
+# res<-getDat() #simulated data  #the default setting: scenario='A' and SoM=0.5
+# odat<-res$traning.set  #training set
+# vdat<-res$testing.set  #testing set
+# 
+# DTRES<-DTfit(odat,vdat)
+# 
+# DTRES
+# 
+# #get (testing set) MSE manually
+# mean( ( DTRES$v_predict - vdat$true_STE   )^2   )
 
 
 

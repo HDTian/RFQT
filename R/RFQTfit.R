@@ -140,25 +140,25 @@ RFQTfit<-function(odat, #training set
   
   return(ALLRES)
 }
-
-###example:
-set.seed(60)
-res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
-odat<-res$traning.set  #training set in 全局环境
-vdat<-res$testing.set  #testing set in 全局环境
-#or: vdat <- NA
-
-ALLRES<-RFQTfit(odat)
-
-ALLRES<-RFQTfit(odat,vdat)
-
-ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
-
-
-
-saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
-ALLRES_<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
-
-#Error in get(name, envir = envir) : object 'my.honest' not found 因为全局环境中没有my.honest这个量
-
-
+# 
+# ###example:
+# set.seed(60)
+# res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+# odat<-res$traning.set  #training set in 全局环境
+# vdat<-res$testing.set  #testing set in 全局环境
+# #or: vdat <- NA
+# 
+# ALLRES<-RFQTfit(odat)
+# 
+# ALLRES<-RFQTfit(odat,vdat)
+# 
+# ALLRES<-RFQTfit(odat,SingleM=TRUE)#single stratification style
+# 
+# 
+# 
+# saveRDS(ALLRES,file='D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
+# ALLRES_<-readRDS('D:\\files\\R new\\Precison_Medicine\\ALLRES_rdata\\test.RData')
+# 
+# #Error in get(name, envir = envir) : object 'my.honest' not found 因为全局环境中没有my.honest这个量
+# 
+# 
