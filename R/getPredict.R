@@ -1,29 +1,29 @@
 
-#Õâ¸öº¯ÊýÆäÊµ¸ü·ºÓÃÒ»Ð©
+#è¿™ä¸ªå‡½æ•°å…¶å®žæ›´æ³›ç”¨ä¸€äº›
 
-getPredict<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹û  ;
+getPredict<-function(RES,#RESä¸ºparSapply(   cl ,  1:100, BootstrapTreeFitting  )çš„ç»“æžœ  ;
                      indicator=1 #1: for OOB predicts    2: for test predicts
-                     ){
-  if(is.null(  dim(RES)  )){ #¼´£¬ RESÖ»ÊÇÒ»´ÎÊä³ö½á¹û£¬²»ÊÇSapplyµÄ½á¹û
+){
+  if(is.null(  dim(RES)  )){ #å³ï¼Œ RESåªæ˜¯ä¸€æ¬¡è¾“å‡ºç»“æžœï¼Œä¸æ˜¯Sapplyçš„ç»“æžœ
     if(  indicator==2    ){
       if(  is.na(  RES$v_predict )){stop('No testing set used, consider OOB error only')}
       Predict<-RES$v_predict
     }else{Predict<- RES$OOB_predict  ;Predict[RES$OOB_predict==0  ]<-NA    }
   }else{
-    BN<-dim(RES)[2]  #dim(RES): 7 100 (7ÎªÊä³öµÄ7ÖÖ$½á¹û: $end_node_information $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2;
-    #100Îªboostrapped´ÎÊý/¼´RFQTµÄsize/¼´BN)
+    BN<-dim(RES)[2]  #dim(RES): 7 100 (7ä¸ºè¾“å‡ºçš„7ç§$ç»“æžœ: $end_node_information $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2;
+    #100ä¸ºboostrappedæ¬¡æ•°/å³RFQTçš„size/å³BN)
     if(  indicator==2    ){
       if(  is.na(  RES[3,1]$v_predict[1] )){stop('No testing set used, consider OOB error only')}
       v_predict<-c()
       for(i in 1:BN){
         v_predict<-cbind( v_predict ,  RES[3,i]$v_predict )  #v_predict
       }
-      total_v_predict<-apply(v_predict, 1  , cumsum )  #×¢Òâ£º»¹ÊÇÒ»¸ö¾ØÕóàÞ
+      total_v_predict<-apply(v_predict, 1  , cumsum )  #æ³¨æ„ï¼šè¿˜æ˜¯ä¸€ä¸ªçŸ©é˜µå™¢
       v_Predict<-c()
       for(i in 1:BN){
-        v_Predict<-cbind(     v_Predict,   total_v_predict[i,]/i  ) #×¢Òâapply(v_predict, 1  , cumsum )µÄ½á¹û»á×Ô¶¯±ä³É×ªÖÃ¾ØÕó£¡
+        v_Predict<-cbind(     v_Predict,   total_v_predict[i,]/i  ) #æ³¨æ„apply(v_predict, 1  , cumsum )çš„ç»“æžœä¼šè‡ªåŠ¨å˜æˆè½¬ç½®çŸ©é˜µï¼
       }
-      Predict<-v_Predict #²»Í¬ÓÚÖ®Ç°µÄMSE ½á¹ûÎªÒ»¸övector£»´ËÊ±Predict½á¹û×ÔÈ»ÎªÒ»¸ö¾ØÕó£¡
+      Predict<-v_Predict #ä¸åŒäºŽä¹‹å‰çš„MSE ç»“æžœä¸ºä¸€ä¸ªvectorï¼›æ­¤æ—¶Predictç»“æžœè‡ªç„¶ä¸ºä¸€ä¸ªçŸ©é˜µï¼
     }else{
       oob_predict<-c()
       oob_times<-c()
@@ -38,21 +38,21 @@ getPredict<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )
         oob_Predict<-cbind(     oob_Predict,              total_oob_predict[i,]/total_oob_times[i,]           )
         oob_Predict[total_oob_times[i,]==0]<-NA
       }
-      Predict<-oob_Predict #²»Í¬ÓÚÖ®Ç°µÄMSE ½á¹ûÎªÒ»¸övector£»´ËÊ±Predict½á¹û×ÔÈ»ÎªÒ»¸ö¾ØÕó£¡
+      Predict<-oob_Predict #ä¸åŒäºŽä¹‹å‰çš„MSE ç»“æžœä¸ºä¸€ä¸ªvectorï¼›æ­¤æ—¶Predictç»“æžœè‡ªç„¶ä¸ºä¸€ä¸ªçŸ©é˜µï¼
     }
   }
-
-
-
-
-
-
-  return(Predict)  #PredictÊÇÒ»¸ö¾ØÕó£¡nrow=vdat sample size; ncol=BootstrapµÄ´ÎÊý/¼´size of RFQT/¼´BN/¼´Nb
-  #ÍùÍù¿ÉÒÔ¿´Ä³¸öindividualµÄpredict valueµÄËæbootstrap´ÎÊýÔö¼Ó¶ø±ä»¯µÄÎÈ¶¨ÐÔÀ´¾ö¶¨NbÊÇ·ñÑ¡È¡µÄ×ã¹»ºÏÊÊ´óÁË£¡
-  #×îºóµÄRFQT predict½á¹û¿ÉÒÔÈ¡¾ØÕóµÄ×îºóÒ»ÁÐ½á¹û(²»ÓÃÔÙcumsum²Ù×÷ÁË£¡)
+  
+  
+  
+  
+  
+  
+  return(Predict)  #Predictæ˜¯ä¸€ä¸ªçŸ©é˜µï¼nrow=vdat sample size; ncol=Bootstrapçš„æ¬¡æ•°/å³size of RFQT/å³BN/å³Nb
+  #å¾€å¾€å¯ä»¥çœ‹æŸä¸ªindividualçš„predict valueçš„éšbootstrapæ¬¡æ•°å¢žåŠ è€Œå˜åŒ–çš„ç¨³å®šæ€§æ¥å†³å®šNbæ˜¯å¦é€‰å–çš„è¶³å¤Ÿåˆé€‚å¤§äº†ï¼
+  #æœ€åŽçš„RFQT predictç»“æžœå¯ä»¥å–çŸ©é˜µçš„æœ€åŽä¸€åˆ—ç»“æžœ(ä¸ç”¨å†cumsumæ“ä½œäº†ï¼)
 }
 
-#getPredict returns a matrix (individual number * Nb): ±íÊ¾Ëæ×ÅtreeµÄÔö³¤Ä¿Ç°µÄforestÏÂµÄ¸÷¸öindividualµÄpredicted effects (¼´HTE)
+#getPredict returns a matrix (individual number * Nb): è¡¨ç¤ºéšç€treeçš„å¢žé•¿ç›®å‰çš„forestä¸‹çš„å„ä¸ªindividualçš„predicted effects (å³
 
 
 # ###examples:
