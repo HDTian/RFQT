@@ -1,28 +1,28 @@
 
 #getVI: get the average value of the variable importance (VI) measurement, base on OOB samples
-#Ö»·µ»Ø¸÷¸öcandidate covariateµÄaverage VI measurements;²»ÓÃ±íÊ¾³ÉorderË³ĞòÁË
+#åªè¿”å›å„ä¸ªcandidate covariateçš„average VI measurements;ä¸ç”¨è¡¨ç¤ºæˆorderé¡ºåºäº†
 
 
-#getÆ½¾ùµÄVI measurement
-getVI<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹û
+#getå¹³å‡çš„VI measurement
+getVI<-function(RES,#RESä¸ºparSapply(   cl ,  1:100, BootstrapTreeFitting  )çš„ç»“æœ
                 VItype=2#VItype=1 for vi1(with label known) VItype=2 for vi2(no label)
-                ){
-  if(is.null(  dim(RES)  )){ #¼´£¬ RESÖ»ÊÇÒ»´ÎÊä³ö½á¹û£¬²»ÊÇSapplyµÄ½á¹û
+){
+  if(is.null(  dim(RES)  )){ #å³ï¼Œ RESåªæ˜¯ä¸€æ¬¡è¾“å‡ºç»“æœï¼Œä¸æ˜¯Sapplyçš„ç»“æœ
     stop('Only one tree; no need to use getVI, simply draw >RES$vi1 or >RES$vi2, where RES is your BootstrapTreeFitting result')
   }
-
-  BN<-dim(RES)[2]  #dim(RES): 7 100 (7ÎªÊä³öµÄ7ÖÖ$½á¹û:  $end_node_information $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2;
-  #100Îªboostrapped´ÎÊı/¼´RFQTµÄsize/¼´BN)
+  
+  BN<-dim(RES)[2]  #dim(RES): 7 100 (7ä¸ºè¾“å‡ºçš„7ç§$ç»“æœ:  $end_node_information $OOB_predict $v_predict $vi1 $vi2 $ts1 $ts2;
+  #100ä¸ºboostrappedæ¬¡æ•°/å³RFQTçš„size/å³BN)
   VI<-c()
-  if(VItype==2){   #single Q-tree ÏÂµÄ¸÷¸öcandidate variableµÄVI measurement
+  if(VItype==2){   #single Q-tree ä¸‹çš„å„ä¸ªcandidate variableçš„VI measurement
     
     for(i in 1:BN){   VI<-rbind( VI ,  RES[5,i]$vi2 )  }
     
     
     VI_means<-apply(VI,2,mean)
-    vires<-VI_means*(VI_means >0  )#ÕâÀïÈÃ¸ºÊıÖµÈ«²¿±ä³É0
+    vires<-VI_means*(VI_means >0  )#è¿™é‡Œè®©è´Ÿæ•°å€¼å…¨éƒ¨å˜æˆ0
     
-    names(vires)<-paste0( 'Covariate', 1:length(vires)   )  #VItype==2Ê±£¬²»¿ÉÄÜ³öÏÖ¡¯N/A¡®µÄÇé¿ö
+    names(vires)<-paste0( 'Covariate', 1:length(vires)   )  #VItype==2æ—¶ï¼Œä¸å¯èƒ½å‡ºç°â€™N/Aâ€˜çš„æƒ…å†µ
   }
   
   
@@ -31,14 +31,13 @@ getVI<-function(RES,#RESÎªparSapply(   cl ,  1:100, BootstrapTreeFitting  )µÄ½á¹
     
     for(i in 1:BN){   VI<-rbind( VI ,  RES[4,i]$vi1 )  }
     
-    if(  (RES[4,1]$vi1)[1] =="N/A"  ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel£¬Ã»ÓĞlabelµÄ»°¾ÍÖ±½Ó»»³ÉNA²»ÓÃ¡¯N/A¡®ÁË£¬²»È»»áÓĞwarning
+    if(  (RES[4,1]$vi1)[1] =="N/A"  ){  #å³ï¼Œåˆ¤æ–­ä¸€ä¸‹æ˜¯å¦æœ‰labelï¼Œæ²¡æœ‰labelçš„è¯å°±ç›´æ¥æ¢æˆNAä¸ç”¨â€™N/Aâ€˜äº†ï¼Œä¸ç„¶ä¼šæœ‰warning
       VI<-matrix( rep(NA,BN), BN,1  )   }
     
     VI_means<-apply(VI,2,mean)
-    vires<-VI_means*(VI_means >0  )#ÕâÀïÈÃ¸ºÊıÖµÈ«²¿±ä³É0  #Èç¹ûÊÇNAÒ²²»Òª½ô£¬²»»á±¨´í
+    vires<-VI_means*(VI_means >0  )#è¿™é‡Œè®©è´Ÿæ•°å€¼å…¨éƒ¨å˜æˆ0  #å¦‚æœæ˜¯NAä¹Ÿä¸è¦ç´§ï¼Œä¸ä¼šæŠ¥é”™
     
-    if( (RES[4,1]$vi1)[1] =="N/A" ){  #¼´£¬ÅĞ¶ÏÒ»ÏÂÊÇ·ñÓĞlabel
-      names(vires)<-'No.label.for.VI1'
+    if( (RES[4,1]$vi1)[1] =="N/A" ){  #å³ï¼Œåˆ¤æ–­ä¸€ä¸‹æ˜¯å¦æœ‰    names(vires)<-'No.label.for.VI1'
     }else{
       names(vires)<-paste0( 'Covariate', 1:length(vires)   )
     }
