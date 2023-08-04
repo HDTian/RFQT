@@ -1,8 +1,10 @@
 ###one single function to run RFQT
 
+#note: if only use Nb=1, use BootstrapTreeFitting instead
+
 RFQTfit<-function(odat, #training set
                   vdat=NA, #validation set (can be empty)
-                  Nb=5,  # the number of Q-trees #if this is single number: # of trees; if this is a vector: the seed index for parSapply 
+                  Nb=5,  # the number of Q-trees (>=2) #if this is single number: # of trees; if this is a vector: the seed index for parSapply 
                   S=5, #the largest depth
                   honest=FALSE, #use honest estimation or not?
                   rate=0.4,# the proportion of candidate variables Ms considered
