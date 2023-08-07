@@ -279,9 +279,43 @@ rpart.plot(tree)#共14 leaf/end-node
 #newFig12 650 500
 #newnewFig12 680 450
 
+###result5: (Fig10)---------------------------------------------------------------------------------------------------
+#individual predicted effect curve changing along the number of Q trees-----------------------------------------------
+RES_real<-ALLRES_real$RES
+predict_matrix2<-getPredict( RES_real,2     )#2: test set predicts
+plot(   1:ncol( predict_matrix2   )   ,  predict_matrix2[10,],  type='l', #ylim=c(0.1,1.2),
+        xlab='Number of Q trees', ylab='Predicted effect')
+lines(     1:ncol( predict_matrix2   )   ,  predict_matrix2[20,], col='blue'   )
+lines(     1:ncol( predict_matrix2   )   ,  predict_matrix2[30,], col='red'   )
+lines(     1:ncol( predict_matrix2   )   ,  predict_matrix2[40,], col='green'   )
+
+legend('topright', legend=c('Individual One', 'Individual Two', 'Individual Three', 'Individual Four'),
+       col=c("black", "blue",'red','green'), lty=1, cex=0.7)
+
+#ggplot version
+ggdata<-data.frame( trees= 1:ncol( predict_matrix2)  , pe=c(predict_matrix2[10,],predict_matrix2[20,],predict_matrix2[30,],predict_matrix2[40,]),   
+                    type=  factor(c( rep( 'Individual One' , ncol(predict_matrix2)  ) ,
+                                     rep( 'Individual Two' , ncol(predict_matrix2)  ) ,
+                                     rep( 'Individual Three' , ncol(predict_matrix2)  ) ,
+                                     rep( 'Individual Four' , ncol(predict_matrix2)  ) )   , 
+                                  levels=c('Individual One','Individual Two','Individual Three','Individual Four'  )  ) )
+p<-ggplot(ggdata,aes(trees, pe,colour=type) ) +
+  geom_line( linewidth=1.0 ) +
+  xlab('Number of Q trees')+ylab('Predicted effect')+
+  #geom_vline(xintercept = 200, colour='grey', linewidth=1.0 ,linetype = 2)+
+  guides(colour = guide_legend(title = " "))+
+  theme(panel.background = element_rect(linewidth=1,colour = "black"),
+        legend.position = c(0.82, 0.78),legend.title = element_blank(),
+        legend.background = element_rect( linewidth=0.5, linetype="solid",colour = "black"),
+        panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+p
+ggsave(paste0('Fig10.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for the female
+       plot =p ,  #非指定 
+       path=paste0('C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots'), 
+       height = 5, width = 7, units = "in",limitsize=TRUE)
 
 
-###result5: (Figure S1)----------------------------------------------------------------------------------------------------------
+###result6: (Figure S1)----------------------------------------------------------------------------------------------------------
 #permutation test results--------------------------------------------------------------------------------------------------------
 
 #single >ALLRES_real<-RFQTfit(odat,vdat,Nb=200,method='DR') with cores=7 是一个半小时
@@ -348,6 +382,13 @@ myf(  coef(fit1)[1] ) ;   myf(  coef(fit1)[1]+c(-1,1)*1.96*coef(fit1)[2] )
 
 
 
+###*if HPC available; try:
+
+data0<-read.csv(  'C:\\Users\\Haodong\\Desktop\\newPER.txt' , header = FALSE, sep = "", dec = ".")
+
+okID<-sort(data0[,1])
+(1:1000)[!(1:1000)%in%okID]#the killed array task ID
+#741 742 901 902
 
 
 
