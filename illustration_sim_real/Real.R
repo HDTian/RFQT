@@ -390,6 +390,53 @@ okID<-sort(data0[,1])
 (1:1000)[!(1:1000)%in%okID]#the killed array task ID
 #741 742 901 902
 
+#HPC补跑并把新的结果加进newPER,txt后
+
+PERdata<-read.csv(  'C:\\Users\\Haodong\\Documents\\RFQT\\RFQT\\Data\\newPER.txt'   , header = FALSE, sep = "", dec = ".")
+dim(PERdata)
+
+okID<-sort(PERdata[,1])
+(1:1000)[!(1:1000)%in%okID] #integer(0)
+
+PERdata<-PERdata[order(PERdata[,1]),]
+
+#same code as above
+TTS<-PERdata[,-1]
+  
+nrow(  TTS )
+###nonparametric testing analysis - Kernel density estimation
+bw.nrd0( TTS[,1] )  
+plot(density(  TTS[,1],from=0.001 ,to=0.005  ),  #truncate the extreme values
+     main=expression(paste("Permutation test statistic ", S[1], " values")) , xlim=c(0.002, 0.005))
+abline(v= 0.003159107,col='red' ) #FigS1_1 500*400
+
+bw.nrd0(TTS[,2] )  # 4.547092  3.867533
+plot(density( TTS[,2]  ),main=expression(paste("Permutation test statistic ", S[2], " values")),xlim=c(  115, 190 ))
+abline(v= 165.9386,col='red' ) #FigS1_2 500*400
+
+#其实没必要依据Kernel smoohting结果来算p-value，因为这会包含smoothing的error
+#直接用nonparameteric! review: Kernel本身就是一种parametric！
+
+
+Bernoulli_ts1<-(TTS[,1]>=0.003159107)
+Bernoulli_ts2<-(TTS[,2]>=165.9386)
+
+#由于样本数不够大！不够接近continuous的Normal distribution！还是用GLM吧
+
+#for S1:
+myf<-function(x){   exp(x)/(1+ exp(x)    )  }
+fit1<-summary(glm(Bernoulli_ts1 ~ 1, family =binomial(link = "logit") ))
+
+myf(  coef(fit1)[1] ) ;   myf(  coef(fit1)[1]+c(-1,1)*1.96*coef(fit1)[2] )   
+#0.058     
+#0.04510002 0.07430265   #1000 
+
+
+#for S2:
+c(0,3/1000)
+
+
+
 
 
 
