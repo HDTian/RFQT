@@ -14,6 +14,7 @@ GetIndex(dat_current,
           method = "DR",
           SoP = 10,
           howGX = "SpecificGX",
+          Halve = FALSE,
           const = NA)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -29,6 +30,7 @@ GetIndex(dat_current,
 }
   \item{howGX}{a character indicates the way to calculate the instrument-exposure associations. Two ways are currenly allowed: the instrument-exposure associations estimated seperately at each stratum (\code{howGX='SpecificGX'}), or use a fixed instrument-exposure association (\code{howGX='const')}
 }
+\item{Halve}{Logical. Indictes whether to split the node by half:half (i.e. 5:5). Default value is \code{FALSE}.}
   \item{const}{a value indicates the fixed instrument-exposure association value used for constructing the Q-tree. Only applicable for \code{howGX='SpecificGX'}.
 }
 }
@@ -39,7 +41,9 @@ GetIndex(dat_current,
 \code{GetIndex} returns a vector with the following three values:'Candidate.index', 'Q.value' , 'node.size'
 \item{Candidate.index }{The index (position rank) of the chosen covariate.}
 \item{Q.value}{The corresponding Q statistic value of the chosen covariate.}
-\item{cnode.size}{The present node size. If \code{GetIndex} is not used for constructing Q-trees, this value simply means the size of the inputed data.}
+\item{minimal.node.size.after.split}{The mimimal sample size of the sun-nodes after splitting.}
+\item{split.style}{Three values denoted by 1,2,3 representing the splitting style used for the final covariate. They are 3:7, 5:5, 7:3, respectively. }  
+}
 }
 \references{
 \cite{Burgess, S., Davies, N. M., & Thompson, S. G. (2014). "Instrumental variable analysis with a nonlinear exposure–outcome relationship". Epidemiology (Cambridge, Mass.), 25(6), 877. (Residual stratification)}
@@ -59,12 +63,10 @@ Haodong Tian
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-library(MendelianRandomization)
-library(tidyverse)
-library(data.table)
-
-res<-getDat()
-
+set.seed(60)
+res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
+odat<-res$traning.set  #training set
+vdat<-res$testing.set  #testing set
 GetIndex(odat,JJ=20)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
