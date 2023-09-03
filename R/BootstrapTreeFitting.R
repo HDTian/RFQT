@@ -225,9 +225,9 @@ BootstrapTreeFitting<-function(seed=1,
 #$vi1 和 $vi2 是按照1：JJ即covariate的顺序
 
 
-# 
-# ###examples:
-# 
+
+###examples:
+
 # set.seed(60)
 # res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
 # odat<-res$traning.set  #training set
@@ -276,4 +276,4 @@ BootstrapTreeFitting<-function(seed=1,
 #                                     'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
 # RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting  ) #本脚本里parSapply的结果常用RES表示
 # stopCluster(cl)
-# 
+
