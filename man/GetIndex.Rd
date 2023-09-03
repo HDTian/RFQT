@@ -11,6 +11,7 @@ Get the Best Covariate Index
 GetIndex(dat_current,
           JJ,
           rate = 1,
+          SpecificM = NA,
           method = "DR",
           SoP = 10,
           howGX = "SpecificGX",
@@ -24,6 +25,7 @@ GetIndex(dat_current,
   \item{JJ}{A positive integer indicates the total number of the candiate covariates.
 }
   \item{rate}{a value ranging from 0 to 1 indicates the proportion of the candidate covariates to be randomly cosidered in each split when construcing the Q-tree.}
+  \item{SpecificM}{a vector indicates the index of candidate variables that can be considered in spliiting. Tbe default value is \code{NA}, which means all candidate variables are possible to be considered.}
   \item{method}{a character indicates the stratification method used for constructing a Q-tree. There are currently three methods: the Doubly-ranked method (\code{method='DR'}), the residual methods (\code{method='Residual'}) and the naive method (recognized by any character except \code{'DR'} and \code{'Residual'}). The default method is \code{'DR'}.
 }
   \item{SoP}{a postive integer (>=2) indicates the size of pre-straum. Only applicable for the doubly-ranked stratification. Default value is 10.
