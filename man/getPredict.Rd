@@ -5,10 +5,12 @@
 Get predict effects for the OOB Data or the Testing Data with Fitted Random Forest of Q-Trees (RFQT)
 }
 \description{
-\code{getMSE} calculates the individual treatment effect estimates for RFQT, either for the OOB data or the testing data.
+\code{getPredict} calculates the predicted individual treatment effect estimates for RFQT, either for the OOB data or the testing data.
 }
 \usage{
-getPredict(RES, indicator = 1)
+getPredict(RES, 
+           indicator = 1
+           )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,7 +18,7 @@ getPredict(RES, indicator = 1)
 a fitting list result from \code{BootstrapTreeFitting} or \code{RFQTfit(odat,vdat)$RES}.
 }
   \item{indicator}{
-numeric indicator to judge which type of predicted effect should be presented. \code{indicator=1} for Out-of-Bag (OOB) data and \code{indicator=2} for th testing data.  Defalut value is \code{indicator=1}.
+numeric indicator to judge which type of predicted effect should be presented. \code{indicator=1} for Out-of-Bag (OOB) data and \code{indicator=2} for th testing data. Defalut value is \code{indicator=1}.
 }
 }
 \details{
@@ -29,7 +31,7 @@ See the relevant part of the original paper for more details of how to predict a
 %% ~put references to the literature/web site here ~
 }
 \author{
-Haodong Tian
+
 }
 \note{
 %%  ~~further notes~~
@@ -41,19 +43,27 @@ Haodong Tian
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-library(parallel)
-
-n_cores_used<-detectCores()-1
-
-cl<-makeCluster(n_cores_used)
-clusterEvalQ(cl=cl , expr=library(dplyr))
+set.seed(60)
+res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+res<-getDat(label=FALSE) 
+odat<-res$traning.set  #training set
+vdat<-res$testing.set  #testing set
+ 
+#When running RFQT with mutiple Q trees/bootstrap - use parallel computation
+Nb<-7 #how many trees in the forest? e.g. 5 trees
+cl<-makeCluster(detectCores()-1)
+clusterEvalQ(cl=cl , expr=library(dplyr)) 
 clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
-clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat','GetTree', 'GetNindex', 'GetIndex' )  )
-
-Nb<-n_cores_used
-
+clusterExport(  cl=cl ,  varlist=c('odat','vdat',
+                                    'GetTree', 'GetNindex', 'GetIndex' )  )
 RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
+stopCluster(cl)
+dim(RES)#7 Nb
 
-getPredict(RES,2)  #1 for OOB; 2 for testing
+predict_matrix<-getPredict(RES,indicator=1 )
+predict_matrix<-getPredict(RES,indicator=2 )
+ 
+dim(predict_matrix)
+View(predict_matrix)
 }
 

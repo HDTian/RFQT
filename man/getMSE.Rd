@@ -7,7 +7,9 @@ Get MSE Values for the OOB Data or the Testing Data with Fitted Q-Tree or Random
 \code{getMSE} calculates the MSE value for RFQT (or a Q-tree if RFQT only contains one single tree)
 }
 \usage{
-getMSE(RES, indicator = 1)
+getMSE(RES, 
+       indicator = 1
+       )
 }
 \arguments{
   \item{RES}{
@@ -27,7 +29,7 @@ numeric indicator to judge which type of MSE should be calculated. \code{indicat
 %% ~put references to the literature/web site here ~
 }
 \author{
-Haodong Tian
+
 }
 \note{
 %%  ~~further notes~~
@@ -39,19 +41,25 @@ Haodong Tian
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-library(parallel)
-
-n_cores_used<-detectCores()-1
-
-cl<-makeCluster(n_cores_used)
-clusterEvalQ(cl=cl , expr=library(dplyr))
+set.seed(60)
+res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+res<-getDat(label=FALSE) 
+odat<-res$traning.set  #training set
+vdat<-res$testing.set  #testing set
+ 
+#When running RFQT with mutiple Q trees/bootstrap - use parallel computation
+Nb<-7 #how many trees in the forest? e.g. 5 trees
+cl<-makeCluster(detectCores()-1)
+clusterEvalQ(cl=cl , expr=library(dplyr)) 
 clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
-clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat','GetTree', 'GetNindex', 'GetIndex' )  )
-
-Nb<-n_cores_used
-
+clusterExport(  cl=cl ,  varlist=c('odat','vdat',
+                                    'GetTree', 'GetNindex', 'GetIndex' )  )
 RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
-
-getMSE(RES,2)  #1 for OOB; 2 for testing
+stopCluster(cl)
+dim(RES)#7 Nb
+ 
+ 
+getMSE(RES,indicator=1 )
+getMSE(RES,indicator=2 )
 }
 

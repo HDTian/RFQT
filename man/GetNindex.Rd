@@ -10,7 +10,7 @@ Get the Q Tree End Node Index for Choosen Samples
 \usage{
 GetNindex(M, 
           rdat, 
-          S = 5)
+          S = NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -19,7 +19,7 @@ GetNindex(M,
   \item{rdat}{
 A data frame. It is the Q-tree informaton result and obtained by \code{rdat<-GetTree()}.
 }
-  \item{S}{A positive integer indicates the max depth of the tree (consistent with \code{rdat}).
+  \item{S}{A positive integer indicates the max depth of each sample will explore along the tree. This number should be consistent with the max depth of the fitted Q tree (also refected in \code{rdat}). The default valus if \code{NA}, which means the code will automatically use the correct \code{S} value.
 %%     ~~Describe \code{S} here~~
 }
 }
@@ -27,13 +27,13 @@ A data frame. It is the Q-tree informaton result and obtained by \code{rdat<-Get
 The inputed data set \code{M} must contain the same candidate covariate information (with the same order) as the training data for the Q-tree. In addition, the first four columns (individual IDs, the instrument, the exposure, the outcome) need to be removed, so that the fist column starts from the first candidate covariate.
 }
 \value{
-\code{GetNindex} returns a vector with the same length of the row number of the inputed data \code{M}. Each element represents the predicted effect according to the reference Q-tree (information expressed by \code{rdat}).
+\code{GetNindex} returns a vector with the same length of the row number of the inputed data \code{M}. Each element represents the end node (i.e. leaf) index according to the reference Q-tree (the tree information was stored within \code{rdat}).
 }
 \references{
 %% ~put references to the literature/web site here ~
 }
 \author{
-Haodong Tian
+
 }
 \note{
 %%  ~~further notes~~
