@@ -64,7 +64,7 @@ the training set and the testing set are of the same form that can be regonized 
 %% ~put references to the literature/web site here ~
 }
 \author{
-Haodong Tian
+
 }
 \note{
 %%  ~~further notes~~

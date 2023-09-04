@@ -51,7 +51,7 @@ If simulated data is used, there should be a end column named as true_STE. That 
 \cite{Tian, H., Mason, A. M., Liu, C., & Burgess, S. (2023). "Relaxing parametric assumptions for non-linear Mendelian randomization using a doubly-ranked stratification method". PLOS Genetics, 19(6), e1010823. (Doubly-ranked stratification)}
 }
 \author{
-Haodong Tian
+
 }
 \note{
 %%  ~~further notes~~

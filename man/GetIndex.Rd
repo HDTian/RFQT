@@ -53,7 +53,7 @@ GetIndex(dat_current,
 \cite{Tian, H., Mason, A. M., Liu, C., & Burgess, S. (2022). "Relaxing parametric assumptions for non-linear Mendelian randomization using a doubly-ranked stratification method". bioRxiv, 2022-06. (Doubly-ranked stratification)}
 }
 \author{
-Haodong Tian
+
 }
 \note{
 %%  ~~further notes~~
