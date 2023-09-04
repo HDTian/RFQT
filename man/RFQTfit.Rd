@@ -50,7 +50,7 @@ a value ranging from 0 to 1 indicates the proportion of the candidate covariates
 logical value indicates whether to use one single covariate variable at all times. Default value is \code{FALSE}. If \code{SingleM=TRUE}, the covariate used are the best variable indicated by \code{GetIndex}.
 }
   \item{Qthreshold}{
-a positive value used as the threshold value for the Q statistic. Default value is 3.0. One can set \code{Qthreshold=0} to ignore the Q-related stopping rule.
+a positive value used as the threshold value for the Q statistic. Default value is 3.84. One can set \code{Qthreshold=0} to ignore the Q-related stopping rule.
 }
   \item{method}{
 a character indicates the stratification method used for constructing a Q-tree. There are currently three methods: the Doubly-ranked method (\code{method='DR'}), the residual methods (\code{method='Residual'}) and the naive method (recognized by any character except \code{'DR'} and \code{'Residual'}). The default method is \code{'DR'}.
