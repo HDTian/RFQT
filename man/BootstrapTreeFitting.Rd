@@ -74,7 +74,7 @@ When the real data is fitted, \code{vi1} is not applicable. When only traning da
 }
 \author{
 %%  ~~who you are~~
-Haodong Tian
+
 }
 \note{
 %%  ~~further notes~~
