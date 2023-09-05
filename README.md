@@ -1,11 +1,11 @@
 # Random Forest of Q Trees
 The data-adaptive effect heterogeneity analysis in Mendelian randomization (MR) with high-dimensional covariates and collider-robust techniques. 
 
-Random Forest of Q Tree (RFQT) can estimate individual or subgroup heterogeneous causal effects and identify the strong effect modifications. Additionally, the package aids in conducting effect heterogeneity testing and constructing the decision structure for predicting individual effects
+Random Forest of Q Tree (RFQT) can estimate individual or subgroup heterogeneous causal effects and identify the strong effect modifications. Additionally, the package aids in conducting effect heterogeneity testing and constructing the decision structure for predicting individual effects.
 
 RFQT is a data-adaptive method, which means there is no need to pre-specify effect modifications, and it accommodates high-dimensional covariates. It also permits covariates to be downstream colliders of the exposure and is able to avoid the collider bias.
 
-This manuscript provides a simple, step-by-step guide to conducting effect heterogeneity analysis in MR using the RFQT package
+This manuscript provides a simple, step-by-step guide to conducting effect heterogeneity analysis in MR using the RFQT package.
 
 ## Load the Package
 Install the RFQT package from Github with:
