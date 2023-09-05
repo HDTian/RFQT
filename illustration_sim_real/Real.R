@@ -274,6 +274,9 @@ names(dt_data)[25]<-'platelet count'
 names(dt_data)[22]<-'monocyte count'
 names(dt_data)[5]<-'weight'
 
+library(rpart)
+library(rpart.plot)
+
 tree <- rpart(estHTE ~. , data = dt_data,control = rpart.control(minsplit  = 2,cp=0.005))#cp可以控制tree的精度
 rpart.plot(tree)#共14 leaf/end-node 
 #newFig12 650 500
