@@ -41,10 +41,10 @@ summary(  ALLRES_real$Predicts_test[,200]  )
 #     Min.   1st Qu.    Median      Mean   3rd Qu.      Max.   (nonhonest)
 #-0.065441 -0.027532 -0.017536 -0.014073 -0.003499  0.061977
 
-hist( ALLRES_real$Predicts_test[,100]  , n=200, main='', xlab='Predicted effect')
+hist( ALLRES_real$Predicts_test[,200]  , n=200, main='', xlab='Predicted effect')
 #hist( ALLRES_real$Predicts_test[,200]  , n=500, xlim=c(-0.1,0.05) , main='', xlab='Predicted effect')
 
-ggdata<-data.frame(Predicted_effect= ALLRES_real$Predicts_test[,100] )
+ggdata<-data.frame(Predicted_effect= ALLRES_real$Predicts_test[,200] )
 p<-ggplot(ggdata) +
   geom_bar(aes(Predicted_effect)) +
   scale_x_binned(n.breaks=30)+
