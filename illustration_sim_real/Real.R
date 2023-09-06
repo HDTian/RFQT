@@ -186,7 +186,7 @@ for(i in c(1:8)){
   if(!i%in%c(3,7)){
     p <- ggplot(ggdata, aes(X, Est))+
       geom_point(ggdata, mapping =aes(X, Est), alpha=1,size=2  )+
-      geom_errorbar(data=ggdata,mapping=aes(x=X,ymin=CI_low,ymax=CI_up),size = 0.25) +
+      geom_errorbar(data=ggdata,mapping=aes(x=X,ymin=CI_low,ymax=CI_up),size = 0.5) +
       geom_hline(aes(yintercept = 0),linetype='dashed',alpha=1,linewidth=1,color='grey')+
       labs(x=paste0(Label_names[i], " (Q statistic: ", sprintf("%.1f", round(QQ,1)) , "; pvalue: ",  sprintf("%.1f",round(pvalue,3) ) ,")"  ),
            y='Stratum-specific estimates')+
@@ -220,6 +220,72 @@ for(i in c(1:8)){
   #        path='C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots', height = 4, width = 5, units = "in",limitsize=TRUE)
 }
 
+#or direct draw the plots:
+Label_names<-c('Diastolic blood pressure (mmHg)',
+               'Hip circumference (cm)',
+               'Monocyte count' ,
+               'Weight (kg)',
+               'Age at survey (years)',
+               'Vital capacity (litres)',
+               'Body mass index' ,
+               'Height (cm)'
+)
+
+refmatrix<-rbind(
+  c(9.63049607371929,0.381217953296086),
+  c(23.1870338714598,0.00578965359286898),
+  c(4.06792187403348,0.906885415485453),
+  c(12.8039869844824,0.171678073383885),
+  c(7.430776921836,0.592362972147522),
+  c(12.6542435402473,0.178885527324497),
+  c(8.86472403604516,0.449854028150605),
+  c(4.44112943737513,0.880058735068154)
+)
+
+
+for(i in c(1:8)){
+  QQ<-refmatrix[i,1]; pvalue<-refmatrix[i,2]
+  #write.csv(ggdata, paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\',"ggdata_",i, '_',QQ,'_',pvalue  , '.csv'), row.names=F)
+  #visualization
+  
+  ggdata<-read.csv( paste0('D:\\files\\R new\\Precison_Medicine\\real_data\\',"ggdata_",i, '_',QQ,'_',pvalue  , '.csv'), header=T,na.strings ="?" )
+  
+  if(!i%in%c(3,7)){
+    p <- ggplot(ggdata, aes(X, Est))+
+      geom_point(ggdata, mapping =aes(X, Est), alpha=1,size=2  )+
+      geom_errorbar(data=ggdata,mapping=aes(x=X,ymin=CI_low,ymax=CI_up),size = 0.5) +
+      geom_hline(aes(yintercept = 0),linetype='dashed',alpha=1,linewidth=1,color='grey')+
+      labs(x=paste0(Label_names[i], " (Q statistic: ", sprintf("%.1f", round(QQ,1)) , "; pvalue: ",  sprintf("%.3f",round(pvalue,3) ) ,")"  ),
+           y='Stratum-specific estimates')+
+      coord_cartesian(ylim = c(-0.07,0.07) )+ 
+      theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+  }
+  
+  if(i==3){
+    p <- ggplot(ggdata, aes(X, Est))+
+      geom_point(ggdata, mapping =aes(X, Est), alpha=1,size=2  )+
+      geom_errorbar(data=ggdata,mapping=aes(x=X,ymin=CI_low,ymax=CI_up),size = 0.5) +
+      geom_hline(aes(yintercept = 0),linetype='dashed',alpha=1,linewidth=1,color='grey')+
+      labs(x=expression( paste('Monocyte count (',10^9,'cells/Litre)', " (Q statistic: 4.0; pvalue: 0.910)"  ) ),
+           y='Stratum-specific estimates')+
+      coord_cartesian(ylim = c(-0.07,0.07) )+   #expression会使得所有目标都直意表达
+      theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+  }
+  
+  
+  if(i==7){
+    p <- ggplot(ggdata, aes(X, Est))+
+      geom_point(ggdata, mapping =aes(X, Est), alpha=1,size=2  )+
+      geom_errorbar(data=ggdata,mapping=aes(x=X,ymin=CI_low,ymax=CI_up),size = 0.5) +
+      geom_hline(aes(yintercept = 0),linetype='dashed',alpha=1,linewidth=1,color='grey')+
+      labs(x=expression( paste('Body mass index (' , kg/m^2  , ')', " (Q statistic: 8.9; pvalue: 0.450)"  ) ),y='Stratum-specific estimates')+
+      coord_cartesian(ylim = c(-0.07,0.07) )+   #expression会使得所有目标都直意表达
+      theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+  }
+  print(p)
+  ggsave(paste0('newFig5_',  i  , '.eps' ), plot = p , 
+         path='C:\\Users\\Haodong\\Desktop\\Precision_Medicine_new\\newplots', height = 4, width = 5, units = "in",limitsize=TRUE)
+}
 
 
 
