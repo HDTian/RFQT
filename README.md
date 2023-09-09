@@ -106,7 +106,7 @@ single_dat <- Dat[, c(1:4,10)]
 DTfit(single_dat) #via tree fitting
 ```
 
-## Permutation Heterogenity Test
+## Permutation Heterogeneity Test
 You may wish to test whether the heterogenous estimates are more variable than expected due to chance alone. This can be acheived by permutation test: first permute the original data and then calculate the test staitstic for each permuated data (stored in `$VI1` or `$VI2` of the RFQT result), and compare them with the real data test staitstic result (i.e. `ALLRES_real$VI1` or `ALLRES_real$VI2`). For more details see the script *illustration_sim_real/Real.R* 
 
 You are encouraged to use HPC as permutation test with RFQT is usually quite time-consuming.
