@@ -14,7 +14,7 @@ getPars(empty.argument)
 \arguments{
   No arguments are needed.
 }
-}
+
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }

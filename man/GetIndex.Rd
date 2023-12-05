@@ -46,7 +46,7 @@ GetIndex(dat_current,
 \item{minimal.node.size.after.split}{The mimimal sample size of the sun-nodes after splitting.}
 \item{split.style}{Three values denoted by 1,2,3 representing the splitting style used for the final covariate. They are 3:7, 5:5, 7:3, respectively. }  
 }
-}
+
 \references{
 \cite{Burgess, S., Davies, N. M., & Thompson, S. G. (2014). "Instrumental variable analysis with a nonlinear exposure–outcome relationship". Epidemiology (Cambridge, Mass.), 25(6), 877. (Residual stratification)}
 

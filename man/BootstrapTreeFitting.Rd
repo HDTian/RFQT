@@ -43,7 +43,7 @@ BootstrapTreeFitting<-function(seed=1,
 \item{const}{a value indicates the fixed instrument-exposure association value used for constructing the Q-tree. Only applicable for \code{howGX='SpecificGX'}.}
 %%     ~~Describe \code{x} here~~
 }
-}
+
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 The training data \code{Odat} and the testing data \code{Vdat} should be of the same form and be a data frame that can be regonized by the functions. The first four columns must be the individual IDs, the (one-dimensional) instrument, the exposure (should be \code{NA} if not available), and the outcome, respectively. The (high-dimensional) covariates are then follwing. Note that all the functions may be working with incorrect column ordering, but the results are misleading. Do make sure the column variable order is correct.
