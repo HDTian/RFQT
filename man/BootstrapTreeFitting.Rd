@@ -129,7 +129,7 @@ user_BootstrapTreeFitting<-function(seed){
 }
 ###parallel computation  -> RFQT
 Nb<-5 #how many trees in the forest?
-cl<-makeCluster(detectCores()-1)
+cl<-makeCluster(2)
 clusterEvalQ(cl=cl , expr=library(dplyr)) 
 clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
 clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat',
