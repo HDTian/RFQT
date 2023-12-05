@@ -45,6 +45,11 @@ The inputed data set \code{M} must contain the same candidate covariate informat
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
+library(MendelianRandomization)
+library(tidyverse) 
+library(data.table) 
+library(parallel)
+
 set.seed(60)
 res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set

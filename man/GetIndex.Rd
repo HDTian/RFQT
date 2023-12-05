@@ -68,6 +68,7 @@ GetIndex(dat_current,
 library(MendelianRandomization)
 library(tidyverse) 
 library(data.table) 
+library(parallel)
 
 set.seed(60)
 res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5

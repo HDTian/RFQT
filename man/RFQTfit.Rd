@@ -131,14 +131,19 @@ the vector of the permutation test statistic values. The two values represent th
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-#set.seed(60)
-#res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
-#odat<-res$traning.set  
-#vdat<-res$testing.set  
+library(MendelianRandomization)
+library(tidyverse) 
+library(data.table) 
+library(parallel)
 
-#ALLRES<-RFQTfit(odat)
+set.seed(60)
+res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+odat<-res$traning.set  
+vdat<-res$testing.set  
+
+ALLRES<-RFQTfit(odat)
  
-#ALLRES<-RFQTfit(odat,vdat,Nb=200)
+ALLRES<-RFQTfit(odat,vdat,Nb=200)
 
 
 }

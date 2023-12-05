@@ -64,8 +64,9 @@ If simulated data is used, there should be a end column named as true_STE. That 
 }
 \examples{
 library(MendelianRandomization)
-library(tidyverse)
-library(data.table)
+library(tidyverse) 
+library(data.table) 
+library(parallel)
 
 res<-getDat()
 odat<-res$traning.set  #training set

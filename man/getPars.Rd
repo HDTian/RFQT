@@ -43,6 +43,11 @@ Haodong Tian
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
+library(MendelianRandomization)
+library(tidyverse) 
+library(data.table) 
+library(parallel)
+
 res<-getDat()
 odat<-res$traning.set  #training set
 vdat<-res$testing.set  #testing set
