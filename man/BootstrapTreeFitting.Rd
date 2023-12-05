@@ -99,7 +99,7 @@ vdat<-res$testing.set  #testing set
 
 #When running RFQT with mutiple Q trees/bootstrap - use parallel computation
 Nb<-5 #how many trees in the forest? e.g. 5 trees
-cl<-makeCluster(detectCores()-1)#规定用多少并行clusters/线程
+cl<-makeCluster(2)#规定用多少并行clusters/线程
 clusterEvalQ(cl=cl , expr=library(dplyr))  
 clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
 clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat',
