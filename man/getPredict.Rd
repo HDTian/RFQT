@@ -69,6 +69,6 @@ predict_matrix<-getPredict(RES,indicator=1 )
 predict_matrix<-getPredict(RES,indicator=2 )
  
 dim(predict_matrix)
-View(predict_matrix)
+###View(predict_matrix)
 }
 
