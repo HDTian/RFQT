@@ -41,24 +41,24 @@ See the VI measurement part of the original paper for more detailed VI introduct
 
 }
 \examples{
-set.seed(60)
-res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
-res<-getDat(label=FALSE) 
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
+#set.seed(60)
+#res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+#res<-getDat(label=FALSE) 
+#odat<-res$traning.set  #training set
+#vdat<-res$testing.set  #testing set
  
-#When running RFQT with mutiple Q trees/bootstrap - use parallel computation
-Nb<-7 #how many trees in the forest? e.g. 5 trees
-cl<-makeCluster(detectCores()-1)
-clusterEvalQ(cl=cl , expr=library(dplyr)) 
-clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
-clusterExport(  cl=cl ,  varlist=c('odat','vdat',
+##When running RFQT with mutiple Q trees/bootstrap - use parallel computation
+#Nb<-7 #how many trees in the forest? e.g. 5 trees
+#cl<-makeCluster(detectCores()-1)
+#clusterEvalQ(cl=cl , expr=library(dplyr)) 
+#clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
+#clusterExport(  cl=cl ,  varlist=c('odat','vdat',
                                     'GetTree', 'GetNindex', 'GetIndex' )  )
-RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
-stopCluster(cl)
-dim(RES)#7 Nb
+#RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
+#stopCluster(cl)
+#dim(RES)#7 Nb
 
-getVI(RES,VItype=1 )
-getVI(RES,VItype=2 )
+#getVI(RES,VItype=1 )
+#getVI(RES,VItype=2 )
 }
 

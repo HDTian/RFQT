@@ -103,17 +103,17 @@ the end nodes (leaves) information of the fitted Q tree, which contains the end-
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-set.seed(60)
-res<-getDat() #simulated data  #the default setting: scenario='A' and SoM=0.5
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
+#set.seed(60)
+#res<-getDat() #simulated data  #the default setting: scenario='A' and SoM=0.5
+#odat<-res$traning.set  #training set
+#vdat<-res$testing.set  #testing set
  
-DTRES<-DTfit(odat,vdat)
+#DTRES<-DTfit(odat,vdat)
  
-DTRES
+#DTRES
  
-#get (testing set) MSE manually
-mean( ( DTRES$v_predict - vdat$true_STE   )^2   )
+##get (testing set) MSE manually
+#mean( ( DTRES$v_predict - vdat$true_STE   )^2   )
 
 
 }

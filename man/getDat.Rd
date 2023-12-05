@@ -76,6 +76,10 @@ the training set and the testing set are of the same form that can be regonized 
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
+library(MendelianRandomization)
+library(tidyverse) 
+library(data.table) 
+
 set.seed(60)
 res<-getDat() #simulated data #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  #training set

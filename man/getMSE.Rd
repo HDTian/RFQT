@@ -41,25 +41,25 @@ numeric indicator to judge which type of MSE should be calculated. \code{indicat
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-set.seed(60)
-res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
-res<-getDat(label=FALSE) 
-odat<-res$traning.set  #training set
-vdat<-res$testing.set  #testing set
+#set.seed(60)
+#res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+#res<-getDat(label=FALSE) 
+#odat<-res$traning.set  #training set
+#vdat<-res$testing.set  #testing set
  
-#When running RFQT with mutiple Q trees/bootstrap - use parallel computation
-Nb<-7 #how many trees in the forest? e.g. 5 trees
-cl<-makeCluster(detectCores()-1)
-clusterEvalQ(cl=cl , expr=library(dplyr)) 
-clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
-clusterExport(  cl=cl ,  varlist=c('odat','vdat',
+##When running RFQT with mutiple Q trees/bootstrap - use parallel computation
+#Nb<-7 #how many trees in the forest? e.g. 5 trees
+#cl<-makeCluster(detectCores()-1)
+#clusterEvalQ(cl=cl , expr=library(dplyr)) 
+#clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
+#clusterExport(  cl=cl ,  varlist=c('odat','vdat',
                                     'GetTree', 'GetNindex', 'GetIndex' )  )
-RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
-stopCluster(cl)
-dim(RES)#7 Nb
+#RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  )
+#stopCluster(cl)
+#dim(RES)#7 Nb
  
  
-getMSE(RES,indicator=1 )
-getMSE(RES,indicator=2 )
+#getMSE(RES,indicator=1 )
+#getMSE(RES,indicator=2 )
 }
 
