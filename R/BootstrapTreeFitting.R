@@ -9,7 +9,7 @@
 #(2)不存在true effect的概念，也没有MSE，更没有VI1
 #(3)real中新加了一个ts1 ts2的概念；sim当然也可以加进去
 
-#注意：和DTfit相比，区别在于： 
+#注意：和DTfit相比，区别在于： DTfit
 #没有bootstrap, 因此没有OOB，也没有VI1 VI2；只有$end_node_information $v_predict $ts1 $ts2
 #强制默认rate=1
 
