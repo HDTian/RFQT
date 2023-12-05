@@ -86,7 +86,56 @@ When the real data is fitted, \code{vi1} is not applicable. When only traning da
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
+library(MendelianRandomization)
+library(tidyverse) 
+library(data.table) 
+library(parallel)
 
+set.seed(60)
+res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
+odat<-res$traning.set  #training set
+vdat<-res$testing.set  #testing set
+
+
+#When running RFQT with mutiple Q trees/bootstrap - use parallel computation
+Nb<-5 #how many trees in the forest? e.g. 5 trees
+cl<-makeCluster(detectCores()-1)#规定用多少并行clusters/线程
+clusterEvalQ(cl=cl , expr=library(dplyr))  
+clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
+clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat',
+                                    'GetTree', 'GetNindex', 'GetIndex' )  )#or any other arguments
+RES<-parSapply(   cl ,  1:Nb, BootstrapTreeFitting  ) 
+stopCluster(cl)
+dim(RES)#7 Nb
+##If you wish to use your own parameters rather than the default parameters, try:
+#general exmaple
+user_BootstrapTreeFitting<-function(seed){
+  RES<-BootstrapTreeFitting(seed,
+                            honest=my.honest,
+                            S=my.S,
+                            JJ=my.JJ,   #or any partial of the arguments
+                            rate=my.rate,
+                            Qthreshold=my.Qthreshold,
+                            method=my.method,
+                            SoP=my.SoP,
+                            howGX=my.howGX,
+                            endsize=my.endsize)
+  return(RES)
+}
+#specific exmaple
+user_BootstrapTreeFitting<-function(seed){
+  RES<-BootstrapTreeFitting(seed,SoP=20)
+  return(RES)
+}
+###parallel computation  -> RFQT
+Nb<-5 #how many trees in the forest?
+cl<-makeCluster(detectCores()-1)
+clusterEvalQ(cl=cl , expr=library(dplyr)) 
+clusterEvalQ(cl=cl , expr=library(MendelianRandomization) )
+clusterExport(  cl=cl ,  varlist=c( 'odat', 'vdat',
+                                    'GetTree', 'GetNindex', 'GetIndex' , 'BootstrapTreeFitting')  )
+RES<-parSapply(   cl ,  1:Nb, user_BootstrapTreeFitting  )
+stopCluster(cl)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
