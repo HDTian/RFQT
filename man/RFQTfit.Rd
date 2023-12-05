@@ -141,9 +141,9 @@ res<-getDat() #simulated data  #the deflaut setting: scenario='A' and SoM=0.5
 odat<-res$traning.set  
 vdat<-res$testing.set  
 
-ALLRES<-RFQTfit(odat)
+###try: ALLRES<-RFQTfit(odat)
  
-ALLRES<-RFQTfit(odat,vdat,Nb=200)
+###try: ALLRES<-RFQTfit(odat,vdat,Nb=200)
 
 
 }
