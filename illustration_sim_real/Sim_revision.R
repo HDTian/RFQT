@@ -149,6 +149,43 @@ p<- ggplot(data = ggdata, mapping = aes(x = SoM, y = results))+
 p
 
 
+
+
+###or use HPC (100 independent simulations; each contains the 6*3=18 results, representing ATEresults , Nresults ,  DRresults  )
+
+#only consider ATEresults and DRresults
+
+RESmatrix<-c()
+for(iii in 1:100){
+  test <- read.table( paste0(  "/Users/haodongtian/Documents/HTEdata/HPCrevision/vector_",iii,".txt"  ), header = FALSE, sep = "\t")
+  RESmatrix<-cbind( RESmatrix , test$V1  )
+}
+
+#get the median value
+result_vector<-apply( RESmatrix, 1, median )
+
+ggdata<-data.frame(  SoM=c( 0, 0.1, 0.2, 0.3 ,0.4 ,0.5    ),
+                     results= result_vector[-c(7:12)],
+                     type=  rep( c('ATE estimation without stratification','RFQT with the doubly-ranked stratification' ) , each=6     ) )
+
+
+p<- ggplot(data = ggdata, mapping = aes(x = SoM, y = results))+
+  geom_line(mapping = aes(color= type ),linewidth=1.0,alpha=1.0)+
+  geom_point(mapping = aes(color= type ) ,size = 2.5,alpha=1.0)+
+  scale_color_manual(values = c("ATE estimation without stratification" = "black", 
+                                "RFQT with the doubly-ranked stratification" = "red"))+
+  labs(x = "Strength of modification", y = "MSE")+
+  theme_bw()+theme(legend.position = "bottom")+
+  guides(  color=guide_legend(title='Method')  )  
+p
+ggsave(paste0('Sim_MSE_supp.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for the female
+       plot =p ,  #非指定 
+       path=paste0('/Users/haodongtian/Documents/HTE_revision'), 
+       height = 4, width = 7, units = "in",limitsize=TRUE)
+
+
+
+
 ###Variable Importance
 
 #taking SoM=0.5 as the example to present the variable importance
@@ -169,6 +206,10 @@ p<-ggplot(ggdata_VI,aes(x=candidate,y=VI))+geom_col( )+
   theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+
   coord_flip()
 p
+ggsave(paste0('sim_supp_VI_left.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for the female
+       plot =p ,  #非指定 
+       path=paste0('/Users/haodongtian/Documents/HTE_revision'), 
+       height = 4, width = 4, units = "in",limitsize=TRUE)
 
 #right plot
 VIindex<-order(ALLRES$VI2)#得出一组position index用以表示最小到最大unit的各自的位置 
@@ -179,7 +220,10 @@ p<-ggplot(ggdata_VI,aes(x=candidate,y=VI))+geom_col( )+
   theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+
   coord_flip()
 p
-
+ggsave(paste0('sim_supp_VI_right.eps' ),   #.eps  #real以后都特指R3： BMI on fev1 for the female
+       plot =p ,  #非指定 
+       path=paste0('/Users/haodongtian/Documents/HTE_revision'), 
+       height = 4, width = 4, units = "in",limitsize=TRUE)
 
 
 
