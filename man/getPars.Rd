@@ -12,7 +12,7 @@ getPars(empty.argument)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
- \item{argument}{
+ \item{empty.argument}{
 No arguments are needed.
 }
 
