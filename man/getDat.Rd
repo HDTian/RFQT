@@ -27,7 +27,7 @@ a integer indicates the size of the training data.
   \item{Nc}{
 a integer indicates the number of candidate variables.
 }
-  \item{Scenario}{
+  \item{scenario}{
 a character indicates the model scenarios data will be simulated from. \code{'A'} refers to scenario where no colliders. \code{'B'} refers to the scenario that half covariates will be colliders. \code{'C'} refers to more complicated collider scenarios.
 }
   \item{SoM}{
