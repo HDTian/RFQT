@@ -10,7 +10,7 @@ Fit a Random Forest of Q Trees (RFQT)
 \usage{
 RFQTfit(odat,
         vdat = NA,
-        Nb = 1,
+        Nb = 5,
         S = 5,
         honest = FALSE,
         rate = 0.4,

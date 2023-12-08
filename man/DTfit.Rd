@@ -8,27 +8,26 @@ Fit a Classical Single Decision Tree (DT)
 \code{DTfit} fits a data set (the training data) by the classical Q tree, and return the summary results. \code{DTfit} works similarly as \code{GetTree} and \code{BootstrapTreeFitting}, but not designed or used for future random forest fitting. If you wish to fit data via single tree rather than random forest, use \code{DTfit}. 
 }
 \usage{
-RFQTfit(Odat=odat,  
-        Vdat=NA,
-        honest=FALSE,
-        S=5, 
-        rate=1, 
-        SingleM=FALSE, 
-        Qthreshold=3.84, 
-        method='DR',
-        SoP=10, 
-        howGX='SpecificGX',
-        Halve=FALSE, 
-        endsize=1000,
-        const=NA)
-        )
+DTfit(Odat = odat, 
+      Vdat = NA, 
+      honest = FALSE, 
+      S = 5, 
+      rate =1, 
+      SingleM = FALSE, 
+      Qthreshold = 3.84, 
+      method = "DR",
+      SoP = 10, 
+      howGX = "SpecificGX", 
+      Halve = FALSE, 
+      endsize = 1000, 
+      const = NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{odat}{
+  \item{Odat}{
 a data frame. This is recognized as the trainging data set.
 }
-  \item{vdat}{
+  \item{Vdat}{
 a data frame. This is recognized as the testing or validation data set. The default value is \code{NA}, indicating that no testing data will be considered. 
 }
 \item{honest}{

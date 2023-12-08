@@ -10,20 +10,20 @@ One Bootstrap Q Tree Fitting
 \code{BootstrapTreeFitting} fits the Q-tree for a bootstrap data of the training set (with user-specific seed) and store the cleaned results. If you do not need results but the original (dirty) Q-tree information, you may use \code{GetTree()}.
 }
 \usage{
-BootstrapTreeFitting<-function(seed=1,
-                               Odat=odat,
-                               Vdat=vdat,
-                               honest=FALSE,
-                               S=5,
-                               rate=0.4,
-                               SingleM=FALSE,
-                               Qthreshold=3.84,
-                               method='DR',
-                               SoP=10,
-                               howGX='SpecificGX',
-                               Halve=FALSE,
-                               endsize=1000,
-                               const=NA)
+BootstrapTreeFitting(seed=1,
+                     Odat=odat,
+                     Vdat=vdat,
+                     honest=FALSE,
+                     S=5,
+                     rate=0.4,
+                     SingleM=FALSE,
+                     Qthreshold=3.84,
+                     method='DR',
+                     SoP=10,
+                     howGX='SpecificGX',
+                     Halve=FALSE,
+                     endsize=1000,
+                     const=NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
