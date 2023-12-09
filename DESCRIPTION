@@ -10,8 +10,9 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
   MendelianRandomization,
-  dplyr,
   tidyverse,
   data.table,
   parallel
+Suggests:
+  dplyr
 
