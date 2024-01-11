@@ -58,12 +58,16 @@ vdat<-res$testing.set  #testing set
 rdat<-GetTree(odat)
  
  
-vdat_Nindex<-GetNindex(vdat[,5:24] ,rdat )#the M colnumber and order should be same as the training data
+vdat_Nindex<-GetNindex(vdat[,5:24] ,rdat )
+#the M colnumber and order should be same as the training data
  
  
-#may use another independent data (estimation data) to calculate the endnode-specific IV/MR estimates
+#may use another independent data (estimation data) to 
+#calculate the endnode-specific IV/MR estimates
  
-#for example: let odat halves into trdata (tree data) and estdata (estimation data); also have rdat<-GetTree(trdata)
+#for example: 
+#let odat halves into trdata (tree data) and estdata (estimation data); 
+#also we can have rdat<-GetTree(trdata)
  
 trdat<-odat[1: (nrow(odat)/2) ,]#tree data
 estdat<-odat[(nrow(odat)/2+1):nrow(odat) ,] #estimaiton data
