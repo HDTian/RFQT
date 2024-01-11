@@ -74,5 +74,6 @@ estdat<-odat[(nrow(odat)/2+1):nrow(odat) ,] #estimaiton data
  
 rdat<-GetTree(trdat)#fitted Q tree
  
-estdat$Nindex<-GetNindex(estdat[,5:24] ,rdat ) #rdat contains the tree information (i.e. decision rule)
+estdat$Nindex<-GetNindex(estdat[,5:24] ,rdat ) 
+#rdat contains the tree information (i.e. decision rule)
 }
