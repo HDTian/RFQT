@@ -37,8 +37,8 @@ GetIndex<-function(dat_current,#dat_current: current data #must be data.frame wi
       dat_order$pre_stratum<-    rep(1:(floor(N/SoP)+1), each=SoP,length.out=N)#(floor(N/SoP)+1)*SoP >= N 保证能超过就行
 
       #rank twice (ie doubly-ranked)
-      temp<-arrange(  dat_order, Mobj )  #按照Mobj升序排一下  #arrange()应该也没有随机性
-      dat_order<-arrange(  temp ,pre_stratum ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
+      temp<-dplyr::arrange(  dat_order, Mobj )  #按照Mobj升序排一下  #arrange()应该也没有随机性
+      dat_order<-dplyr::arrange(  temp ,pre_stratum ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
       dat_order$strata<-as.vector( unlist(sapply( as.numeric(table( dat_order$pre_stratum )) , function(x) sort(rep(c(1,1,1,2,2,3,3,4,4,4),length.out=x)) )   ) )
 
     }else{
