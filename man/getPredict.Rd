@@ -27,21 +27,7 @@ See the relevant part of the original paper for more details of how to predict a
 \value{
 \code{getPredict} returns a matrix where the row corresponds to the sample size (either the OOB data or the testing data, depending on the indicator used) and the column coresponds to the number of Q-trees. Each column represents the individual predicted effects with the present number of Q trees.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
 
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 library(MendelianRandomization)
 library(tidyverse) 

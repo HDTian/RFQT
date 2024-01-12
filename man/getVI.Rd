@@ -25,21 +25,7 @@ See the VI measurement part of the original paper for more detailed VI introduct
 \value{
 \code{getVI} retuns a vector indicating the variable importacne (VI) measurements for all the candidate covariates (with the same ordering of the candidate covariates to the original fitting data).
 }
-\references{
 
-}
-\author{
-
-}
-\note{
-
-}
-
-
-
-\seealso{
-
-}
 \examples{
 library(MendelianRandomization)
 library(tidyverse) 

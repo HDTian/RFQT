@@ -60,21 +60,9 @@ The data-generating model is the same as the Scenarios in the original paper, wh
 
 the training set and the testing set are of the same form that can be regonized by all the functions. The first four columns are the individual IDs, the instrument, the exposure, and the outcome, respectively. The high-dimensional (dimensions = \code{Nc}) covariates are then follwing. The end column is \code{true_STE}, representing the individal controlled direct treatment effect (see more details in the original paper).
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
 
-}
-\note{
-%%  ~~further notes~~
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 library(MendelianRandomization)
 library(tidyverse) 

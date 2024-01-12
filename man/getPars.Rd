@@ -18,9 +18,7 @@ No arguments are needed.
 
 }
 
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
 \code{getPars()} returns the following information: the total number of candidate covariates, the training data size, the testing data siz, the stratification method, the size of pre-stratum (if applicable), the proportion of the covariates randomly considered in each node split, the maximal tree depth allowed, the way to calculate the instrument-exposure associations, the fixed instrument-exposure association level (if applicable), the minimal node size, the threshold value of the Q statistic.
 
@@ -36,15 +34,7 @@ See the original paper for the details of each parameter information.
 \author{
 Haodong Tian
 }
-\note{
-%%  ~~further notes~~
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 library(MendelianRandomization)
 library(tidyverse) 
