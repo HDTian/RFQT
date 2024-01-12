@@ -28,9 +28,7 @@ Note that only the variable defined in the global enviroment will be considered.
 
 See the original paper for the details of each parameter information.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
+
 \author{
 Haodong Tian
 }

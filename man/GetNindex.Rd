@@ -29,21 +29,7 @@ The inputed data set \code{M} must contain the same candidate covariate informat
 \value{
 \code{GetNindex} returns a vector with the same length of the row number of the inputed data \code{M}. Each element represents the end node (i.e. leaf) index according to the reference Q-tree (the tree information was stored within \code{rdat}).
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
 
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 library(MendelianRandomization)
 library(tidyverse) 

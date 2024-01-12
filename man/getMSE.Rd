@@ -19,27 +19,11 @@ a fitting list result from \code{BootstrapTreeFitting} or \code{RFQTfit(odat,vda
 numeric indicator to judge which type of MSE should be calculated. \code{indicator=1} for Out-of-Bag (OOB) data and \code{indicator=2} for th testing data.  Defalut value is \code{indicator=1}.
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
 \code{getMSE} returns a vector of MSE with the increase of the number of Q-trees. The stable MSE values should indicate an appropriate number of Q-trees.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
 
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 library(MendelianRandomization)
 library(tidyverse) 
