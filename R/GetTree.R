@@ -67,8 +67,8 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
             
             dat_order$pre_stratum<-    rep(1:(floor(N/SoP)+1), each=SoP,length.out=N)#(floor(N/SoP)+1)*SoP >= N 保证能超过就行
             #rank twice (ie doubly-ranked)
-            temp<-arrange(  dat_order, Mobj )  #按照Mobj升序排一下  #arrange()应该也没有随机性
-            dat_order<-arrange(  temp ,pre_stratum ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
+            temp<-dplyr::arrange(  dat_order, Mobj )  #按照Mobj升序排一下  #arrange()应该也没有随机性
+            dat_order<-dplyr::arrange(  temp ,pre_stratum ) #即，保证pre_strata按顺序排列，并且每个pre_strata中的目标量都是升序
             dat_order$strata<-as.vector( unlist(sapply( as.numeric(table( dat_order$pre_stratum )) , function(x) sort(rep(repvector,length.out=x)) )   ) )
             
           }else{
@@ -102,7 +102,7 @@ GetTree<-function(dat,#input: the data set (either training dats or tree data); 
           
           ###storage/merge into dat---
           #update the Nindex
-          dat_current<-arrange(  dat_order, I )  #最后按照I排序，方便融入dat中; #dat_current$I 中肯定不包含Iindex
+          dat_current<-dplyr::arrange(  dat_order, I )  #最后按照I排序，方便融入dat中; #dat_current$I 中肯定不包含Iindex
           vect<-rep(0,NNN)  #NNN为dat (total) sample size
           vect[(dat$I)%in%(dat_current$I )]<-dat_current$strata*0.1^s #times 0.1^s 相当于在Nindex后面添上新的tree information
           #update the Nindex
